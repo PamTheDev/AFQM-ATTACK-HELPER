@@ -62,7 +62,7 @@ create_hitbox_panel_input(
     text_y,
     7
 );
-/*
+
 // X / Y
 // IDs 1 and 2
 
@@ -93,3 +93,4 @@ for (var i = 5; i <= array_length(input_labels) - 1; i++)
         5
     );
 }
+scr_hide_all_text_input_groups()

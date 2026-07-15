@@ -150,6 +150,9 @@ if (
 
 draw_set_colour(c_dkgray);
 
+if global.text_input_instance == id
+			draw_set_colour(merge_colour(c_gray, c_dkgray, 0.8))
+			
 if (highlighted)
 {
     draw_set_colour(c_gray);
@@ -185,12 +188,12 @@ if (text_input_type == "dropdown" && global.text_input_instance == id)
             my <= option_y2 + bh2;
 
         draw_set_colour(c_dkgray);
-
+		
         if (mouse_hover_button)
         {
             draw_set_colour(c_gray);
         }
-
+		
         draw_rectangle(
             bx2,
             option_y2,

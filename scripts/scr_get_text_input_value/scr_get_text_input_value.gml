@@ -321,18 +321,26 @@ function scr_text_input_can_convert_to_number(_text)
 }
 function scr_setup_text_input(_id, _group = "default")
 {
-    attatched_id = _id;
+    if (!variable_global_exists("menu_focus"))
+    {
+        global.menu_focus = "default";
+    }
 
+    attatched_id = _id;
     input_group = _group;
-    input_enabled = true;
-    visible = true;
 
     image_speed = 0;
     image_index = _id;
 
     scr_initiate_text_value(attatched_id);
-
     scr_refresh_text_input_display();
+
+    // Only show this input if its group is currently active.
+    var should_show = global.menu_focus == input_group;
+
+    input_enabled = should_show;
+    visible = should_show;
+    highlighted = false;
 
     text_input_ready = true;
 }

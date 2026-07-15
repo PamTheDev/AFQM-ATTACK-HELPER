@@ -37,5 +37,5 @@
     "path":"sprites/spr_text_input/spr_text_input.yy",
   },
   "spriteMaskId":null,
-  "visible":true,
+  "visible":false,
 }

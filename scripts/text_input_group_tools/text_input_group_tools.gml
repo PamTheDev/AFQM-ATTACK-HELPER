@@ -21,6 +21,78 @@ function scr_clear_text_input_focus()
 }
 
 
+function scr_show_only_text_input_group(_group)
+{
+    if (!variable_global_exists("menu_focus"))
+    {
+        global.menu_focus = "default";
+    }
+
+    // IMPORTANT:
+    // If this group is already active, do NOT clear focus.
+    if (global.menu_focus == _group)
+    {
+        with (obj_text_input)
+        {
+            var should_show = input_group == _group;
+
+            input_enabled = should_show;
+            visible = should_show;
+
+            if (!should_show)
+            {
+                highlighted = false;
+            }
+        }
+
+        return;
+    }
+
+    // Only clear focus when actually switching groups.
+    scr_clear_text_input_focus();
+
+    global.menu_focus = _group;
+
+    with (obj_text_input)
+    {
+        var should_show = input_group == _group;
+
+        input_enabled = should_show;
+        visible = should_show;
+        highlighted = false;
+
+        if (should_show)
+        {
+            scr_refresh_text_input_display();
+        }
+    }
+}
+
+function scr_hide_all_text_input_groups()
+{
+    if (!variable_global_exists("menu_focus"))
+    {
+        global.menu_focus = "default";
+    }
+
+    // Already hidden; do not keep clearing focus every frame.
+    if (global.menu_focus == "default")
+    {
+        return;
+    }
+
+    scr_clear_text_input_focus();
+
+    global.menu_focus = "default";
+
+    with (obj_text_input)
+    {
+        input_enabled = false;
+        visible = false;
+        highlighted = false;
+    }
+}
+
 function scr_set_text_input_group_enabled(_group, _enabled)
 {
     with (obj_text_input)
@@ -36,56 +108,11 @@ function scr_set_text_input_group_enabled(_group, _enabled)
 
                 if (global.text_input_instance == id)
                 {
-                    scr_text_input_finish_property_undo();
-
-                    global.text_input_focused = false;
-                    global.text_input_id = undefined;
-                    global.text_input_instance = noone;
-                    keyboard_string = "";
+                    scr_clear_text_input_focus();
                 }
             }
         }
     }
 }
 
-
-function scr_hide_all_text_input_groups()
-{
-	global.menu_focus = "default"
-    with (obj_text_input)
-    {
-        input_enabled = false;
-        visible = false;
-        highlighted = false;
-
-        if (global.text_input_instance == id)
-        {
-            scr_text_input_finish_property_undo();
-
-            global.text_input_focused = false;
-            global.text_input_id = undefined;
-            global.text_input_instance = noone;
-            keyboard_string = "";
-        }
-    }
-}
-
 //global.menu_focus = _group
-function scr_show_only_text_input_group(_group)
-{
-    scr_clear_text_input_focus();
-global.menu_focus = _group
-    with (obj_text_input)
-    {
-        var should_show = input_group == _group;
-
-        input_enabled = should_show;
-        visible = should_show;
-        highlighted = false;
-
-        if (should_show)
-        {
-            scr_refresh_text_input_display();
-        }
-    }
-}
