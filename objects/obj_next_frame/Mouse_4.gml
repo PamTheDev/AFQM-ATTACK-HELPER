@@ -1,0 +1,1 @@
+global.current_timeline_frame += 1;

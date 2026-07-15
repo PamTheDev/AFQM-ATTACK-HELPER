@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"add_hitbox_at_playhead",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"add_hitbox_at_playhead",
+  "parent":{
+    "name":"Timeline",
+    "path":"folders/Scripts/Timeline.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_timeline_key_states_equal",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_timeline_key_states_equal",
+  "parent":{
+    "name":"Timeline",
+    "path":"folders/Scripts/Timeline.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

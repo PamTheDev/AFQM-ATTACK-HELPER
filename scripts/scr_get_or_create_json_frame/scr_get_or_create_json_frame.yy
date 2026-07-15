@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_get_or_create_json_frame",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_get_or_create_json_frame",
+  "parent":{
+    "name":"JSON",
+    "path":"folders/Scripts/JSON.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

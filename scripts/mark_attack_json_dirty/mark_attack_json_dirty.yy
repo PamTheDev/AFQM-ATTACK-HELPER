@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"mark_attack_json_dirty",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"mark_attack_json_dirty",
+  "parent":{
+    "name":"JSON",
+    "path":"folders/Scripts/JSON.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

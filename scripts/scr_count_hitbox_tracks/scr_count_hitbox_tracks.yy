@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_count_hitbox_tracks",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_count_hitbox_tracks",
+  "parent":{
+    "name":"Timeline",
+    "path":"folders/Scripts/Timeline.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

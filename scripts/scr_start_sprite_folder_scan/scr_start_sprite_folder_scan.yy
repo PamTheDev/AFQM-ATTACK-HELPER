@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_start_sprite_folder_scan",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_start_sprite_folder_scan",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

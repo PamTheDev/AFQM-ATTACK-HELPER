@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_fix_animation_key_lengths",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_fix_animation_key_lengths",
+  "parent":{
+    "name":"Timeline",
+    "path":"folders/Scripts/Timeline.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

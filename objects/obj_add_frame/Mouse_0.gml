@@ -1,0 +1,1 @@
+scr_add_animation_frame_at_playhead(global.timeline, 0);

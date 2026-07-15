@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"phase_tools",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"phase_tools",
+  "parent":{
+    "name":"Timeline",
+    "path":"folders/Scripts/Timeline.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

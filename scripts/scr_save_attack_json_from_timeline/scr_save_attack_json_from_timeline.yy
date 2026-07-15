@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_save_attack_json_from_timeline",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_save_attack_json_from_timeline",
+  "parent":{
+    "name":"JSON",
+    "path":"folders/Scripts/JSON.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

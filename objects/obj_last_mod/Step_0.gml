@@ -1,0 +1,1 @@
+button_text = "Quick load " + string(scr_get_cached_mod_folder_name())

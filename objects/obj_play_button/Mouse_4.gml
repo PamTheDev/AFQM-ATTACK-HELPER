@@ -1,0 +1,1 @@
+global.playing_animation = !global.playing_animation

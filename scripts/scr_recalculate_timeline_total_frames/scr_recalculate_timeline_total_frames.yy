@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_recalculate_timeline_total_frames",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_recalculate_timeline_total_frames",
+  "parent":{
+    "name":"Timeline",
+    "path":"folders/Scripts/Timeline.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}
