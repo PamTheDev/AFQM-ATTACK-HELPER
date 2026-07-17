@@ -263,7 +263,7 @@ draw_rectangle(canvas_x, canvas_y, canvas_x + canvas_w, canvas_y + canvas_h, tru
 
 
 // Info text outside the clipped canvas
-
+window_set_caption("Editing Attack: " + string(global.selected_sprite_folder_name))
 
 draw_set_color(c_white);
 draw_text(canvas_x, canvas_y - 48, global.selected_sprite_folder_name);

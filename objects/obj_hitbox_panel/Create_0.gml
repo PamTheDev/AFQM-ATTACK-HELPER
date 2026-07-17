@@ -51,6 +51,20 @@ function create_hitbox_panel_input(_input_id, _x, _y, _xscale)
     return inst;
 }
 
+function create_frame_panel_input(_input_id, _x, _y, _xscale)
+{
+    var inst = instance_create_layer(_x, _y, "Instances", obj_text_input);
+
+    with (inst)
+    {
+        image_xscale = _xscale;
+        image_yscale = 1;
+
+        scr_setup_text_input(_input_id, "frame");
+    }
+
+    return inst;
+}
 
 // Hitbox type dropdown
 // ID 0
@@ -93,4 +107,21 @@ for (var i = 5; i <= array_length(input_labels) - 1; i++)
         5
     );
 }
+
+text_y = panel_y + 97;
+
+create_frame_panel_input(
+    100,
+    panel_x + string_length("Frame:") * 11,
+    text_y,
+    2
+);
+text_y += 35;
+	
+create_frame_panel_input(
+    101,
+    panel_x + string_length("Frame:") * 11,
+    text_y,
+    2
+);
 scr_hide_all_text_input_groups()

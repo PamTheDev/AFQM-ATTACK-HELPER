@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"select_animation_keys",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"select_animation_keys",
+  "parent":{
+    "name":"Timeline",
+    "path":"folders/Scripts/Timeline.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

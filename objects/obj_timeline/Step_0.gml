@@ -214,28 +214,6 @@ if (mouse_in_phase_area && mouse_check_button_pressed(mb_left))
 
 
 
-// RIGHT-CLICK PHASE AREA = ADD PHASE AFTER CLICKED PHASE
-
-/*
-if (mouse_in_phase_area && mouse_check_button_pressed(mb_right))
-{
-    var clicked_frame = round((mx - content_x + scroll_x) / frame_w);
-    clicked_frame = max(0, clicked_frame);
-
-    var clicked_phase = scr_timeline_get_phase_index_at_frame(timeline, clicked_frame);
-
-    selected_phase_index = scr_timeline_add_phase_after(
-        timeline,
-        clicked_phase,
-        new_phase_default_duration
-    );
-
-    show_debug_message("Added new phase.");
-
-    exit;
-}
-
-*/
 
 // SCROLL / ZOOM
 
@@ -320,17 +298,38 @@ if (mouse_over_timeline && mouse_check_button_pressed(mb_left))
                 my >= key_y1 &&
                 my <= key_y2;
 
-            if (inside_key && !mouse_over_timeline_header)
-            {
-                selected_track = t;
-                selected_key = k;
-				if (track.type == "hitbox")
+			if (inside_key && !mouse_over_timeline_header)
+			{
+				selected_track = t;
+				selected_key = k;
+
+				if (track.type == "animation")
 				{
+					scr_clear_hitbox_selection();
+
+					scr_toggle_select_animation_key(timeline, t, k);
+
+					if (!is_undefined(global.selected_animation_key))
+					{
+						scr_show_only_text_input_group("frame");
+					}
+					else
+					{
+						scr_hide_all_text_input_groups();
+					}
+				}
+				else if (track.type == "hitbox")
+					{
+					scr_clear_animation_selection();
+
 					scr_select_hitbox_key(timeline, t, k);
+					scr_show_only_text_input_group("hitbox");
 				}
 				else
 				{
+					scr_clear_animation_selection();
 					scr_clear_hitbox_selection();
+					scr_hide_all_text_input_groups();
 				}
 
                 drag_start_mouse_x = mx;
@@ -379,7 +378,11 @@ if (mouse_over_timeline && mouse_check_button_pressed(mb_left))
     if (!found_key)
     {
         var new_track_row_y = track_start_y + array_length(timeline.tracks) * track_h - scroll_y;
+		
 		scr_clear_hitbox_selection();
+		scr_clear_animation_selection();
+		scr_hide_all_text_input_groups();
+
         var mouse_over_new_track_button =
             mx >= timeline_x &&
             mx <= timeline_x + header_w &&
@@ -607,7 +610,11 @@ if (mouse_check_button_released(mb_left))
     selected_key = -1;
 }
 
-if (!is_undefined(global.selected_hitbox))
+if (!is_undefined(global.selected_animation_key))
+{
+    scr_show_only_text_input_group("frame");
+}
+else if (!is_undefined(global.selected_hitbox))
 {
     scr_show_only_text_input_group("hitbox");
 }

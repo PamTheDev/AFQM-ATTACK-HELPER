@@ -61,35 +61,15 @@ header_w = 120;
 ruler_h = 24;
 
 
-if (!variable_global_exists("current_timeline_frame"))
-{
-    global.current_timeline_frame = 0;
-}
+if (!variable_global_exists("current_timeline_frame")) global.current_timeline_frame = 0;
+if (variable_global_exists("timeline")) timeline = global.timeline;
+if (variable_global_exists("menu_focus")) global.menu_focus = "default";
 
-if (variable_global_exists("timeline"))
-{
-    timeline = global.timeline;
-}
-if (variable_global_exists("menu_focus"))
-{
-    global.menu_focus = "default";
-}
-if (!variable_global_exists("selected_hitbox"))
-{
-    global.selected_hitbox = undefined;
-}
+if (!variable_global_exists("selected_hitbox")) global.selected_hitbox = undefined;
+if (!variable_global_exists("selected_hitbox_key")) global.selected_hitbox_key = undefined;
+if (!variable_global_exists("selected_hitbox_track")) global.selected_hitbox_track = -1;
+if (!variable_global_exists("selected_hitbox_key_index")) global.selected_hitbox_key_index = -1;
 
-if (!variable_global_exists("selected_hitbox_key"))
-{
-    global.selected_hitbox_key = undefined;
-}
-
-if (!variable_global_exists("selected_hitbox_track"))
-{
-    global.selected_hitbox_track = -1;
-}
-
-if (!variable_global_exists("selected_hitbox_key_index"))
-{
-    global.selected_hitbox_key_index = -1;
-}
+if (!variable_global_exists("selected_animation_key")) global.selected_animation_key = undefined;
+if (!variable_global_exists("selected_animation_track")) global.selected_animation_track = -1;
+if (!variable_global_exists("selected_animation_key_index")) global.selected_animation_key_index = -1;

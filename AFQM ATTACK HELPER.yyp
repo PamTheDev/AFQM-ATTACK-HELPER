@@ -123,6 +123,8 @@
     {"id":{"name":"scr_starts_with","path":"scripts/scr_starts_with/scr_starts_with.yy",},},
     {"id":{"name":"scr_timeline_key_states_equal","path":"scripts/scr_timeline_key_states_equal/scr_timeline_key_states_equal.yy",},},
     {"id":{"name":"scr_undo_last_action","path":"scripts/scr_undo_last_action/scr_undo_last_action.yy",},},
+    {"id":{"name":"select_animation_keys","path":"scripts/select_animation_keys/select_animation_keys.yy",},},
+    {"id":{"name":"selected_animation_key_helpers","path":"scripts/selected_animation_key_helpers/selected_animation_key_helpers.yy",},},
     {"id":{"name":"text_input_group_tools","path":"scripts/text_input_group_tools/text_input_group_tools.yy",},},
     {"id":{"name":"undo_property","path":"scripts/undo_property/undo_property.yy",},},
     {"id":{"name":"spr_attack_editor","path":"sprites/spr_attack_editor/spr_attack_editor.yy",},},

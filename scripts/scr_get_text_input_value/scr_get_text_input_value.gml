@@ -33,6 +33,9 @@ function scr_get_text_input_value(_id)
         case 8: return scr_get_selected_hitbox_number_value("hitlag", 0);
         case 9: return scr_get_selected_hitbox_number_value("angle", 0);
 		case 10: return scr_get_selected_hitbox_key_duration();
+        // Animation frame properties
+        case 100: return scr_get_selected_animation_key_number_value("start", 0);
+        case 101: return scr_get_selected_animation_key_number_value("animation_frame", 0);
     }
 
     return "0";
@@ -126,6 +129,13 @@ function scr_update_text_input(_id, _input)
         case 10:
 			scr_set_selected_hitbox_key_duration(_input);
 			break;
+			
+		case 100:
+			scr_set_selected_animation_key_number_value("start", _input);
+			break;
+		case 101:
+			scr_set_selected_animation_key_number_value("animation_frame", _input);
+			break;
     }
 }
 
@@ -181,6 +191,8 @@ function scr_initiate_text_value(_id, _input = "", _array = "")
         case 8:
         case 9:
 		case 10:
+		case 100:
+		case 101:
         {
             text_input_type = "input";
             numbers_only = true;
