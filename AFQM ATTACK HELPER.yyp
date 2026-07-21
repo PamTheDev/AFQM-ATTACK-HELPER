@@ -41,7 +41,7 @@
   "isEcma":false,
   "LibraryEmitters":[],
   "MetaData":{
-    "IDEVersion":"2024.14.4.222",
+    "IDEVersion":"2026.0.0.16",
   },
   "name":"AFQM ATTACK HELPER",
   "resources":[
@@ -53,6 +53,7 @@
     {"id":{"name":"libxprocess","path":"extensions/libxprocess/libxprocess.yy",},},
     {"id":{"name":"obj_add_frame","path":"objects/obj_add_frame/obj_add_frame.yy",},},
     {"id":{"name":"obj_add_hitbox","path":"objects/obj_add_hitbox/obj_add_hitbox.yy",},},
+    {"id":{"name":"obj_context_menu","path":"objects/obj_context_menu/obj_context_menu.yy",},},
     {"id":{"name":"obj_edit_button","path":"objects/obj_edit_button/obj_edit_button.yy",},},
     {"id":{"name":"obj_generate_buttons","path":"objects/obj_generate_buttons/obj_generate_buttons.yy",},},
     {"id":{"name":"obj_hitbox_panel","path":"objects/obj_hitbox_panel/obj_hitbox_panel.yy",},},
@@ -128,6 +129,7 @@
     {"id":{"name":"text_input_group_tools","path":"scripts/text_input_group_tools/text_input_group_tools.yy",},},
     {"id":{"name":"undo_property","path":"scripts/undo_property/undo_property.yy",},},
     {"id":{"name":"spr_attack_editor","path":"sprites/spr_attack_editor/spr_attack_editor.yy",},},
+    {"id":{"name":"spr_context_menu","path":"sprites/spr_context_menu/spr_context_menu.yy",},},
     {"id":{"name":"spr_hitbox_buttons","path":"sprites/spr_hitbox_buttons/spr_hitbox_buttons.yy",},},
     {"id":{"name":"spr_hitbox_circle","path":"sprites/spr_hitbox_circle/spr_hitbox_circle.yy",},},
     {"id":{"name":"spr_hitbox_square","path":"sprites/spr_hitbox_square/spr_hitbox_square.yy",},},

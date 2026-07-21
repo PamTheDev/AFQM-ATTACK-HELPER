@@ -28,7 +28,6 @@ function scr_show_only_text_input_group(_group)
         global.menu_focus = "default";
     }
 
-    // IMPORTANT:
     // If this group is already active, do NOT clear focus.
     if (global.menu_focus == _group)
     {
