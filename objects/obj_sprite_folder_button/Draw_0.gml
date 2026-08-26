@@ -5,7 +5,7 @@ else if (hovered)
 else
     draw_set_color(c_gray);
 
-draw_rectangle(x, y, x + button_width, y + button_height, false);
+draw_roundrect(x, y, x + button_width, y + button_height, false);
 
 draw_set_color(c_white);
 draw_text(x + 12, y + 12, sprite_folder_name);

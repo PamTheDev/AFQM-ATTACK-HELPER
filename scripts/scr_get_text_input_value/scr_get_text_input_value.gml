@@ -36,9 +36,24 @@ function scr_get_text_input_value(_id)
         // Animation frame properties
         case 100: return scr_get_selected_animation_key_number_value("start", 0);
         case 101: return scr_get_selected_animation_key_number_value("animation_frame", 0);
-    }
+		// Flag properties
+		case 200: {
+			var flag = scr_get_selected_flag();
 
-    return "0";
+			if (is_undefined(flag))
+			{
+				return "";
+			}
+
+			if (!variable_struct_exists(flag, "code"))
+			{
+				flag.code = "";
+			}
+
+			return flag.code;
+		}
+		case 201: return global.current_flag_add;
+	}
 }
 
 function scr_update_text_input(_id, _input)
@@ -136,6 +151,21 @@ function scr_update_text_input(_id, _input)
 		case 101:
 			scr_set_selected_animation_key_number_value("animation_frame", _input);
 			break;
+			case 200:
+{
+    var flag = scr_get_selected_flag();
+
+    if (!is_undefined(flag))
+    {
+        flag.type = "code";
+        flag.code = _input;
+
+        mark_attack_json_dirty();
+        scr_save_current_attack_json();
+    }
+
+    break;
+}
     }
 }
 
@@ -180,7 +210,12 @@ function scr_initiate_text_value(_id, _input = "", _array = "")
 
         
         // Numeric hitbox inputs
-        
+        case 200:
+		{
+			text_input_type = "codebox";
+			numbers_only = false;
+			break;
+		}
         case 1:
         case 2:
         case 3:
@@ -460,6 +495,11 @@ function scr_refresh_text_input_display()
         {
             current_input = "";
         }
+    }
+    else if (text_input_type == "codebox")
+    {
+        current_list = [];
+        current_input = string(scr_get_text_input_value(attatched_id));
     }
     else
     {

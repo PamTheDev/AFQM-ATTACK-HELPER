@@ -306,6 +306,7 @@ if (mouse_over_timeline && mouse_check_button_pressed(mb_left))
 				if (track.type == "animation")
 				{
 					scr_clear_hitbox_selection();
+					scr_clear_flag_selection();
 
 					scr_toggle_select_animation_key(timeline, t, k);
 
@@ -321,14 +322,32 @@ if (mouse_over_timeline && mouse_check_button_pressed(mb_left))
 				else if (track.type == "hitbox")
 					{
 					scr_clear_animation_selection();
+					scr_clear_flag_selection();
 
 					scr_select_hitbox_key(timeline, t, k);
 					scr_show_only_text_input_group("hitbox");
+				}
+				else if (track.type == "flag")
+				{
+					scr_clear_animation_selection();
+					scr_clear_hitbox_selection();
+
+					scr_toggle_select_flag_key(timeline, t, k);
+
+					if (!is_undefined(global.selected_flag_key))
+					{
+						scr_show_only_text_input_group("flag");
+					}
+					else
+					{
+						scr_hide_all_text_input_groups();
+					}
 				}
 				else
 				{
 					scr_clear_animation_selection();
 					scr_clear_hitbox_selection();
+					scr_clear_flag_selection();
 					scr_hide_all_text_input_groups();
 				}
 
@@ -353,7 +372,7 @@ if (mouse_over_timeline && mouse_check_button_pressed(mb_left))
 
                 var inside_resize_handle = mx >= key_x + key_w - resize_handle_w;
 
-                if (inside_resize_handle && track.type != "animation")
+                if (inside_resize_handle && track.type != "animation" && track.type != "flag")
                 {
                     drag_mode = "resize";
                     show_debug_message("Timeline key resize started.");
@@ -378,7 +397,7 @@ if (mouse_over_timeline && mouse_check_button_pressed(mb_left))
     if (!found_key)
     {
         var new_track_row_y = track_start_y + array_length(timeline.tracks) * track_h - scroll_y;
-		
+		scr_clear_flag_selection();
 		scr_clear_hitbox_selection();
 		scr_clear_animation_selection();
 		scr_hide_all_text_input_groups();
@@ -461,7 +480,7 @@ if (mouse_check_button(mb_left))
 
             active_key.start = new_start;
 
-            if (active_track.type == "animation")
+            if (active_track.type == "animation" || active_track.type == "flag")
             {
                 active_key.duration = 1;
             }
@@ -610,7 +629,11 @@ if (mouse_check_button_released(mb_left))
     selected_key = -1;
 }
 
-if (!is_undefined(global.selected_animation_key))
+if (!is_undefined(global.selected_flag_key))
+{
+    scr_show_only_text_input_group("flag");
+}
+else if (!is_undefined(global.selected_animation_key))
 {
     scr_show_only_text_input_group("frame");
 }

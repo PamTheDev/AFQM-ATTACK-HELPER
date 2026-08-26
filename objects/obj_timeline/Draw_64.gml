@@ -248,6 +248,10 @@ else if (track.type == "animation")
 {
     draw_set_color(make_color_rgb(80, 120, 255));
 }
+else if (track.type == "flag")
+{
+    draw_set_color(make_color_rgb(60, 242, 78));
+}
 else if (track.type == "hitbox")
 {
     if (variable_struct_exists(key, "hitbox"))
@@ -271,13 +275,36 @@ else
             draw_set_color(merge_colour(original_color, c_black, 0.4));
         }
 
-        draw_rectangle(
-            key_x,
-            local_row_y + 4,
-            key_x + key_w,
-            local_row_y + track_h - 4,
-            false
-        );
+        if (track.type == "flag")
+        {
+			
+			draw_rectangle(
+				key_x,
+				local_row_y + 4,
+				key_x + key_w / 3,
+				local_row_y + track_h - 4,
+				false
+			);
+			
+            draw_triangle(
+                key_x + key_w / 3,
+                local_row_y + 4,
+                key_x + key_w / 3,
+                local_row_y + ((track_h / 3) * 2),
+                key_x + ((key_w  / 3) * 2),
+                local_row_y + track_h /3,
+                false
+            );
+        }
+		else {
+			draw_rectangle(
+				key_x,
+				local_row_y + 4,
+				key_x + key_w,
+				local_row_y + track_h - 4,
+				false
+			);
+		}
 
         if (track.type == "animation")
         {
@@ -311,6 +338,10 @@ else
                 key_text = "?";
             }
         }
+		else if (track.type == "flag")
+        {
+            key_text = "";
+        }
         else
         {
             key_text = "er";
@@ -319,7 +350,7 @@ else
         draw_text(key_x + 4, local_row_y + 7, key_text);
 
         // Resize handle
-        if (track.type != "animation")
+        if (track.type != "animation" && track.type != "flag" )
         {
             draw_set_color(c_white);
             draw_rectangle(

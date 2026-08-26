@@ -73,3 +73,7 @@ if (!variable_global_exists("selected_hitbox_key_index")) global.selected_hitbox
 if (!variable_global_exists("selected_animation_key")) global.selected_animation_key = undefined;
 if (!variable_global_exists("selected_animation_track")) global.selected_animation_track = -1;
 if (!variable_global_exists("selected_animation_key_index")) global.selected_animation_key_index = -1;
+
+if (!variable_global_exists("selected_flag_key")) global.selected_flag_key = undefined;
+if (!variable_global_exists("selected_flag_track")) global.selected_flag_track = -1;
+if (!variable_global_exists("selected_flag_key_index")) global.selected_flag_key_index = -1;
