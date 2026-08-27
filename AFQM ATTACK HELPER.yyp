@@ -61,6 +61,7 @@
     {"id":{"name":"obj_last_mod","path":"objects/obj_last_mod/obj_last_mod.yy",},},
     {"id":{"name":"obj_mod_directory_select","path":"objects/obj_mod_directory_select/obj_mod_directory_select.yy",},},
     {"id":{"name":"obj_mod_folder_loader","path":"objects/obj_mod_folder_loader/obj_mod_folder_loader.yy",},},
+    {"id":{"name":"obj_new_attack_button","path":"objects/obj_new_attack_button/obj_new_attack_button.yy",},},
     {"id":{"name":"obj_next_frame","path":"objects/obj_next_frame/obj_next_frame.yy",},},
     {"id":{"name":"obj_play_button","path":"objects/obj_play_button/obj_play_button.yy",},},
     {"id":{"name":"obj_prev_frame","path":"objects/obj_prev_frame/obj_prev_frame.yy",},},

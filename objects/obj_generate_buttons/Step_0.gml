@@ -155,14 +155,31 @@ else if (loader_state == "create_buttons")
         btn.sprite_folder_name = global.sprite_folders[create_index].name;
         btn.sprite_folder_path = global.sprite_folders[create_index].path;
 
-        // Important: this is the matching .gml file.
+        
         btn.related_gml_path = global.sprite_folders[create_index].gml_path;
 
         create_index += 1;
 
         if (create_index >= total_buttons)
         {
-            break;
+			col = create_index div buttons_per_column;
+			row = create_index mod buttons_per_column;
+
+			bx = button_start_x + col * (button_w + button_gap_x);
+			by = button_start_y + row * (button_h + button_gap_y);
+
+			btn = instance_create_layer(bx, by, "Instances", obj_new_attack_button);
+
+			btn.button_width = button_w;
+			btn.button_height = button_h;
+
+			btn.sprite_folder_index = create_index;
+			btn.sprite_folder_name = global.sprite_folders[create_index].name;
+			btn.sprite_folder_path = global.sprite_folders[create_index].path;
+
+        
+			btn.related_gml_path = global.sprite_folders[create_index].gml_path;
+			break;
         }
     }
 
