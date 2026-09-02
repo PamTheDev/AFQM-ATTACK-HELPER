@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"scr_run_json_to_gml_converter",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"scr_run_json_to_gml_converter",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

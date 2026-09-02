@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"timeline_flag_tools",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"timeline_flag_tools",
+  "parent":{
+    "name":"Timeline",
+    "path":"folders/Scripts/Timeline.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

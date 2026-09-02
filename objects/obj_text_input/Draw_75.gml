@@ -209,8 +209,76 @@ if (text_input_type == "dropdown" && global.text_input_instance == id)
 
 
 
-// Draw current text
+// Draw codebox text
+if (text_input_type == "codebox")
+{
+    draw_set_colour(c_white);
 
+    var draw_x = x + code_padding;
+    var draw_y = y + code_padding - code_scroll_y;
 
-draw_set_colour(c_white);
-draw_text(x + 4, y + 6, current_input);
+    var line = "";
+    var line_index = 0;
+
+    // These store where the cursor should draw.
+    var cursor_x = draw_x;
+    var cursor_y = draw_y;
+
+    for (var i = 1; i <= string_length(current_input); i++)
+    {
+        var ch = string_char_at(current_input, i);
+
+        if (ch == "\n")
+        {
+            draw_text(
+                draw_x,
+                draw_y + line_index * code_line_height,
+                line
+            );
+
+            // If the text ends with a newline, the cursor should move
+            // to the start of the next empty line.
+            line = "";
+            line_index++;
+
+            cursor_x = draw_x;
+            cursor_y = draw_y + line_index * code_line_height;
+        }
+        else
+        {
+            line += ch;
+
+            cursor_x = draw_x + string_width(line);
+            cursor_y = draw_y + line_index * code_line_height;
+        }
+    }
+
+    // Draw the final line.
+    draw_text(
+        draw_x,
+        draw_y + line_index * code_line_height,
+        line
+    );
+
+    // Make sure the cursor is at the end of the final line.
+    cursor_x = draw_x + string_width(line);
+    cursor_y = draw_y + line_index * code_line_height;
+
+    // Draw cursor.
+    if (global.text_input_instance == id)
+    {
+        draw_set_colour(c_white);
+
+        draw_line(
+            cursor_x + 2,
+            cursor_y,
+            cursor_x + 2,
+            cursor_y + code_line_height
+        );
+    }
+}
+else
+{
+    draw_set_colour(c_white);
+    draw_text(x + 4, y + 6, current_input);
+}

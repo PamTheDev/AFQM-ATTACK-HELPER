@@ -52,7 +52,7 @@ phase_resize_handle_w = 6;
 phase_drag_mode = "none";
 phase_drag_index = -1;
 
-selected_phase_index = -1;
+if (!variable_global_exists("selected_phase_index")) global.selected_phase_index = -1;
 
 new_phase_default_duration = 5;
 
@@ -73,3 +73,7 @@ if (!variable_global_exists("selected_hitbox_key_index")) global.selected_hitbox
 if (!variable_global_exists("selected_animation_key")) global.selected_animation_key = undefined;
 if (!variable_global_exists("selected_animation_track")) global.selected_animation_track = -1;
 if (!variable_global_exists("selected_animation_key_index")) global.selected_animation_key_index = -1;
+
+if (!variable_global_exists("selected_flag_key")) global.selected_flag_key = undefined;
+if (!variable_global_exists("selected_flag_track")) global.selected_flag_track = -1;
+if (!variable_global_exists("selected_flag_key_index")) global.selected_flag_key_index = -1;

@@ -155,18 +155,24 @@ else if (loader_state == "create_buttons")
         btn.sprite_folder_name = global.sprite_folders[create_index].name;
         btn.sprite_folder_path = global.sprite_folders[create_index].path;
 
-        // Important: this is the matching .gml file.
+        
         btn.related_gml_path = global.sprite_folders[create_index].gml_path;
 
         create_index += 1;
 
         if (create_index >= total_buttons)
         {
-            break;
+			
+			break;
         }
     }
+	/*
+	    var col = create_index div buttons_per_column;
+        var row = create_index mod buttons_per_column;
 
-    loader_progress = 0.80 + 0.20 * (create_index / total_buttons);
+        var bx = button_start_x + col * (button_w + button_gap_x);
+        var by = button_start_y + row * (button_h + button_gap_y);
+*/
 
     if (create_index >= total_buttons)
     {
@@ -174,6 +180,11 @@ else if (loader_state == "create_buttons")
         loader_progress = 1;
         loader_state = "done";
         global.loading_sprite_buttons = false;
+		var btn = instance_create_layer(0, 0, "Instances", obj_new_attack_button);
+
+        btn.button_width = button_w;
+        btn.button_height = button_h;
+
     }
 }
 else if (loader_state == "done")

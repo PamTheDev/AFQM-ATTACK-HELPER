@@ -34,8 +34,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_spr_folder",
-    "path":"sprites/spr_spr_folder/spr_spr_folder.yy",
+    "name":"spr_edit_button",
+    "path":"sprites/spr_edit_button/spr_edit_button.yy",
   },
   "spriteMaskId":null,
   "visible":true,
