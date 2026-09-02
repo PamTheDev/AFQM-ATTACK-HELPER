@@ -142,6 +142,7 @@
     {"id":{"name":"spr_hitbox_circle","path":"sprites/spr_hitbox_circle/spr_hitbox_circle.yy",},},
     {"id":{"name":"spr_hitbox_square","path":"sprites/spr_hitbox_square/spr_hitbox_square.yy",},},
     {"id":{"name":"spr_hp","path":"sprites/spr_hp/spr_hp.yy",},},
+    {"id":{"name":"spr_na_button","path":"sprites/spr_na_button/spr_na_button.yy",},},
     {"id":{"name":"spr_new_frame","path":"sprites/spr_new_frame/spr_new_frame.yy",},},
     {"id":{"name":"spr_next","path":"sprites/spr_next/spr_next.yy",},},
     {"id":{"name":"spr_pc","path":"sprites/spr_pc/spr_pc.yy",},},

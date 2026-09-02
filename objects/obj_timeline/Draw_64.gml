@@ -117,7 +117,7 @@ scr_draw_timeline_phase_tags(
     content_w,
     phase_label_height,
     phase_bracket_height,
-    selected_phase_index
+    global.selected_phase_index
 );
 
 

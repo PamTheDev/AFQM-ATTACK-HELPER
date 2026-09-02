@@ -76,13 +76,13 @@ var mouse_in_phase_area = point_in_rectangle(
 // M = merge selected phase with next phase
 
 
-if (selected_phase_index >= 0)
+if (global.selected_phase_index >= 0)
 {
     if (keyboard_check_pressed(ord("N")))
     {
-selected_phase_index = scr_timeline_add_phase_after(
+global.selected_phase_index = scr_timeline_add_phase_after(
     global.timeline,
-    selected_phase_index,
+    global.selected_phase_index,
     new_phase_default_duration
 );
 
@@ -94,10 +94,10 @@ exit;
 
     if (keyboard_check_pressed(ord("M")))
     {
-scr_timeline_merge_phase_with_next(global.timeline, selected_phase_index);
+scr_timeline_merge_phase_with_next(global.timeline, global.selected_phase_index);
 
-selected_phase_index = clamp(
-    selected_phase_index,
+global.selected_phase_index = clamp(
+    global.selected_phase_index,
     0,
     max(0, array_length(global.timeline.phases) - 1)
 );
@@ -165,7 +165,7 @@ if (phase_drag_mode != "none")
 
 if (mouse_in_phase_area && mouse_check_button_pressed(mb_left))
 {
-    selected_phase_index = -1;
+    global.selected_phase_index = -1;
 
     phase_drag_mode = "none";
     phase_drag_index = -1;
@@ -183,7 +183,7 @@ if (mouse_in_phase_area && mouse_check_button_pressed(mb_left))
 
         if (over_left && p > 0)
         {
-            selected_phase_index = p;
+            global.global.selected_phase_index = p;
             phase_drag_index = p;
             phase_drag_mode = "left";
 
@@ -192,7 +192,7 @@ if (mouse_in_phase_area && mouse_check_button_pressed(mb_left))
         }
         else if (over_right)
         {
-            selected_phase_index = p;
+            global.selected_phase_index = p;
             phase_drag_index = p;
             phase_drag_mode = "right";
 
@@ -201,7 +201,7 @@ if (mouse_in_phase_area && mouse_check_button_pressed(mb_left))
         }
         else if (inside_phase)
         {
-            selected_phase_index = p;
+            global.selected_phase_index = p;
 
             show_debug_message("Selected phase:");
             show_debug_message(timeline.phases[p].name);
@@ -629,7 +629,11 @@ if (mouse_check_button_released(mb_left))
     selected_key = -1;
 }
 
-if (!is_undefined(global.selected_flag_key))
+if (!is_undefined(global.selected_phase_index))
+{
+    scr_show_only_text_input_group("phase");
+}
+else if (!is_undefined(global.selected_flag_key))
 {
     scr_show_only_text_input_group("flag");
 }

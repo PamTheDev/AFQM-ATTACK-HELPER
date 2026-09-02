@@ -52,7 +52,7 @@ phase_resize_handle_w = 6;
 phase_drag_mode = "none";
 phase_drag_index = -1;
 
-selected_phase_index = -1;
+if (!variable_global_exists("selected_phase_index")) global.selected_phase_index = -1;
 
 new_phase_default_duration = 5;
 
