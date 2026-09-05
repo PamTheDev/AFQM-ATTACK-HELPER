@@ -9,8 +9,14 @@ function convert_gif_gml(_gif_path, _sprite_root){
 	// Create Folder
 	directory_create(_new_dir);
 	
+	var _spr;
+	
 	// Import Sprite
-	var _spr = sprite_add_gif(_gif_path, 0, 0, [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]);
+	if(filename_ext(_gif_path) == ".png"){
+		_spr = sprite_add(_gif_path, 1, true, false, 0, 0);
+	}else{
+		_spr = sprite_add_gif(_gif_path, 0, 0, [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]);
+	}
 	
 	// Loop through each frame and save as png
 	for(var i = 0; i < sprite_get_number(_spr); i++){
@@ -22,15 +28,11 @@ function convert_gif_gml(_gif_path, _sprite_root){
 	
 	
 	var _sprite_json_buffer = buffer_create(1, buffer_grow, 1);
-	
-	buffer_write(_sprite_json_buffer, buffer_string, json_stringify(
-	{	
+	buffer_write(_sprite_json_buffer, buffer_text, json_stringify({	
 		"type":0,
 		"x_origin": sprite_get_width(_spr)/2,
 		"y_origin": sprite_get_height(_spr)/2
 	}));
-	
-	
 	var _sprite_json_path = _new_dir + "/" + "sprite.json"
 	buffer_save(_sprite_json_buffer, _sprite_json_path);
 	buffer_delete(_sprite_json_buffer)

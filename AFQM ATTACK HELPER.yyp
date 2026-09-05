@@ -90,6 +90,7 @@
     {"id":{"name":"scr_build_timeline_from_attack","path":"scripts/scr_build_timeline_from_attack/scr_build_timeline_from_attack.yy",},},
     {"id":{"name":"scr_codebox_update_input","path":"scripts/scr_codebox_update_input/scr_codebox_update_input.yy",},},
     {"id":{"name":"scr_collect_sprite_gifs","path":"scripts/scr_collect_sprite_gifs/scr_collect_sprite_gifs.yy",},},
+    {"id":{"name":"scr_collect_sprite_pngs","path":"scripts/scr_collect_sprite_pngs/scr_collect_sprite_pngs.yy",},},
     {"id":{"name":"scr_count_hitbox_tracks","path":"scripts/scr_count_hitbox_tracks/scr_count_hitbox_tracks.yy",},},
     {"id":{"name":"scr_edit_sprite_folder","path":"scripts/scr_edit_sprite_folder/scr_edit_sprite_folder.yy",},},
     {"id":{"name":"scr_ends_with","path":"scripts/scr_ends_with/scr_ends_with.yy",},},
