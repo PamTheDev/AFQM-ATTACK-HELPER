@@ -142,6 +142,62 @@ function scr_save_attack_json_from_timeline(_timeline, _json_path)
         }
     }
 
+
+    // Add flag keys
+for (var t = 0; t < array_length(_timeline.tracks); t++)
+{
+    var track = _timeline.tracks[t];
+
+    if (track.type != "flag")
+    {
+        continue;
+    }
+
+    for (var k = 0; k < array_length(track.keys); k++)
+    {
+        var key = track.keys[k];
+
+        if (!variable_struct_exists(key, "flag"))
+        {
+            continue;
+        }
+
+        if (is_undefined(key.flag))
+        {
+            continue;
+        }
+
+        if (!variable_struct_exists(key.flag, "code"))
+        {
+            key.flag.code = "";
+        }
+
+        var phase_index = scr_timeline_get_phase_index_at_frame(_timeline, key.start);
+        phase_index = clamp(phase_index, 0, array_length(output.phases) - 1);
+
+        var timeline_phase = _timeline.phases[phase_index];
+        var json_phase = output.phases[phase_index];
+
+        var local_frame = key.start - timeline_phase.start;
+        local_frame = clamp(local_frame, 0, timeline_phase.duration - 1);
+
+        var countdown_frame = timeline_phase.lasts - local_frame;
+
+        var json_frame = scr_get_or_create_json_frame(json_phase, countdown_frame);
+
+        if (!variable_struct_exists(json_frame, "flags"))
+        {
+            json_frame.flags = [];
+        }
+
+        array_push(json_frame.flags, {
+            type: "code",
+            code: key.flag.code,
+            scope: "frame"
+        });
+    }
+}
+
     
     // Ensure attack starts on animation frame 0
     

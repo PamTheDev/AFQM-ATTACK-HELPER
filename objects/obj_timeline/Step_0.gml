@@ -183,7 +183,7 @@ if (mouse_in_phase_area && mouse_check_button_pressed(mb_left))
 
         if (over_left && p > 0)
         {
-            global.global.selected_phase_index = p;
+            global.selected_phase_index = p;
             phase_drag_index = p;
             phase_drag_mode = "left";
 
@@ -202,7 +202,7 @@ if (mouse_in_phase_area && mouse_check_button_pressed(mb_left))
         else if (inside_phase)
         {
             global.selected_phase_index = p;
-
+			//scr_show_only_text_input_group("phase");
             show_debug_message("Selected phase:");
             show_debug_message(timeline.phases[p].name);
             break;
@@ -260,6 +260,7 @@ if (mouse_over_timeline)
 if (mouse_over_timeline && mouse_check_button_pressed(mb_left))
 {
     selected_track = -1;
+	global.selected_phase_index = -1;
     selected_key = -1;
     drag_mode = "";
 
@@ -337,6 +338,7 @@ if (mouse_over_timeline && mouse_check_button_pressed(mb_left))
 					if (!is_undefined(global.selected_flag_key))
 					{
 						scr_show_only_text_input_group("flag");
+						scr_refresh_text_input_group("flag");
 					}
 					else
 					{
@@ -629,7 +631,7 @@ if (mouse_check_button_released(mb_left))
     selected_key = -1;
 }
 
-if (!is_undefined(global.selected_phase_index))
+if (global.selected_phase_index >= 0)
 {
     scr_show_only_text_input_group("phase");
 }

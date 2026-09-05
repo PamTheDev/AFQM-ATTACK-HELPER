@@ -1,10 +1,10 @@
 function scr_build_timeline_from_attack(_attack)
 {
-	var timeline = {
-		total_frames: 0,
-		phases: [],
-		tracks: []
-	};
+    var timeline = {
+        total_frames: 0,
+        phases: [],
+        tracks: []
+    };
 
     var animation_track = {
         name: "Animation",
@@ -13,6 +13,20 @@ function scr_build_timeline_from_attack(_attack)
     };
 
     array_push(timeline.tracks, animation_track);
+
+
+    // Flag track
+
+    var flag_track = {
+        name: "Flags",
+        type: "flag",
+        keys: []
+    };
+
+    array_push(timeline.tracks, flag_track);
+
+
+    // Hitbox tracks
 
     var hitbox_tracks = [];
 
@@ -40,6 +54,55 @@ function scr_build_timeline_from_attack(_attack)
         // That is 17 timeline frames.
         var phase_length = phase_lasts + 1;
 
+
+        if (variable_struct_exists(phase, "flags"))
+        {
+            for (var pf = 0; pf < array_length(phase.flags); pf++)
+            {
+                var phase_flag_data = phase.flags[pf];
+
+                var phase_flag = phase_flag_data;
+
+                if (is_string(phase_flag_data))
+                {
+                    phase_flag = {
+                        type: "code",
+                        code: phase_flag_data,
+                        scope: "phase",
+                        original_line: phase_flag_data
+                    };
+                }
+                else
+                {
+                    if (!variable_struct_exists(phase_flag, "type"))
+                    {
+                        phase_flag.type = "code";
+                    }
+
+                    if (!variable_struct_exists(phase_flag, "code"))
+                    {
+                        phase_flag.code = "";
+                    }
+
+                    phase_flag.scope = "phase";
+                }
+
+                array_push(flag_track.keys, {
+                    start: phase_start,
+                    duration: 1,
+
+                    flag: phase_flag,
+
+                    phase_index: p,
+                    source_countdown_frame: phase_lasts,
+                    source_phase: phase
+                });
+            }
+        }
+
+
+        // Frame data
+
         if (variable_struct_exists(phase, "frames"))
         {
             for (var f = 0; f < array_length(phase.frames); f++)
@@ -53,14 +116,15 @@ function scr_build_timeline_from_attack(_attack)
 
                 var countdown_frame = real(frame_data.frame);
 
-                // IMPORTANT:
                 // Convert countdown attack_frame into normal left-to-right timeline frame.
                 var local_timeline_frame = phase_lasts - countdown_frame;
 
-                // Safety clamp
+                // Safety clamp.
                 local_timeline_frame = clamp(local_timeline_frame, 0, phase_length - 1);
 
                 var absolute_frame = phase_start + local_timeline_frame;
+
+
 
                 if (variable_struct_exists(frame_data, "animationFrame"))
                 {
@@ -74,6 +138,8 @@ function scr_build_timeline_from_attack(_attack)
                         source_frame: frame_data
                     });
                 }
+
+
 
                 if (variable_struct_exists(frame_data, "hitboxes"))
                 {
@@ -101,9 +167,14 @@ function scr_build_timeline_from_attack(_attack)
                         }
 
                         var hitbox_track = hitbox_tracks[track_index - 1];
-						
-                        var hb_lasts = max(1, round(real(hb.lasts)));
-						
+
+                        var hb_lasts = 1;
+
+                        if (variable_struct_exists(hb, "lasts"))
+                        {
+                            hb_lasts = max(1, round(real(hb.lasts)));
+                        }
+
                         array_push(hitbox_track.keys, {
                             start: absolute_frame,
                             duration: hb_lasts,
@@ -117,23 +188,71 @@ function scr_build_timeline_from_attack(_attack)
                         });
                     }
                 }
+
+
+
+                if (variable_struct_exists(frame_data, "flags"))
+                {
+                    for (var fl = 0; fl < array_length(frame_data.flags); fl++)
+                    {
+                        var flag_data = frame_data.flags[fl];
+
+                        var flag = flag_data;
+
+                        if (is_string(flag_data))
+                        {
+                            flag = {
+                                type: "code",
+                                code: flag_data,
+                                scope: "frame",
+                                original_line: flag_data
+                            };
+                        }
+                        else
+                        {
+                            if (!variable_struct_exists(flag, "type"))
+                            {
+                                flag.type = "code";
+                            }
+
+                            if (!variable_struct_exists(flag, "code"))
+                            {
+                                flag.code = "";
+                            }
+
+                            flag.scope = "frame";
+                        }
+
+                        array_push(flag_track.keys, {
+                            start: absolute_frame,
+                            duration: 1,
+
+                            flag: flag,
+
+                            phase_index: p,
+                            source_countdown_frame: countdown_frame,
+                            source_frame: frame_data
+                        });
+                    }
+                }
             }
         }
 
-array_push(timeline.phases, {
-    name: "Phase " + string(p),
-    start: phase_start,
-    duration: phase_length,
-    phase_index: p,
-    lasts: max(0, phase_length - 1)
-});
+
+        array_push(timeline.phases, {
+            name: "Phase " + string(p),
+            start: phase_start,
+            duration: phase_length,
+            phase_index: p,
+            lasts: max(0, phase_length - 1)
+        });
+
         phase_start += phase_length;
     }
 
     timeline.total_frames = phase_start;
 
     scr_sort_all_timeline_tracks(timeline);
-    //scr_fix_animation_key_lengths(timeline);
 
     return timeline;
 }

@@ -145,21 +145,47 @@ function scr_toggle_select_flag_key(_timeline, _track_index, _key_index)
 
     var key = track.keys[_key_index];
 
-    if (!is_undefined(global.selected_flag_key))
+    // Clicking the same selected flag again deselects it
+    if (variable_global_exists("selected_flag_key"))
     {
-        if (global.selected_flag_key == key)
+        if (!is_undefined(global.selected_flag_key))
         {
-            scr_clear_flag_selection();
-            scr_hide_all_text_input_groups();
-            return true;
+            if (global.selected_flag_key == key)
+            {
+                scr_clear_flag_selection();
+                scr_hide_all_text_input_groups();
+                return true;
+            }
         }
     }
 
     scr_clear_hitbox_selection();
     scr_clear_animation_selection();
 
-    scr_select_flag_key(_timeline, _track_index, _key_index);
+    global.selected_flag_key = key;
+    global.selected_flag_track = _track_index;
+    global.selected_flag_key_index = _key_index;
+
+    // Make sure the key has a flag struct
+    if (!variable_struct_exists(key, "flag"))
+    {
+        key.flag = {
+            type: "code",
+            code: "",
+            scope: "frame",
+            original_line: ""
+        };
+    }
+
+    if (!variable_struct_exists(key.flag, "code"))
+    {
+        key.flag.code = "";
+    }
+
     scr_show_only_text_input_group("flag");
+
+    // This forces the code panel to read the new selected flag.code
+    scr_refresh_text_input_group("flag");
 
     return true;
 }
@@ -179,16 +205,31 @@ function scr_get_selected_flag_key()
 }
 function scr_get_selected_flag()
 {
-    var key = scr_get_selected_flag_key();
-
-    if (is_undefined(key))
+    if (!variable_global_exists("selected_flag_key"))
     {
         return undefined;
     }
 
+    if (is_undefined(global.selected_flag_key))
+    {
+        return undefined;
+    }
+
+    var key = global.selected_flag_key;
+
     if (!variable_struct_exists(key, "flag"))
     {
-        key.flag = scr_make_code_flag("", "frame", "");
+        key.flag = {
+            type: "code",
+            code: "",
+            scope: "frame",
+            original_line: ""
+        };
+    }
+
+    if (!variable_struct_exists(key.flag, "code"))
+    {
+        key.flag.code = "";
     }
 
     return key.flag;
