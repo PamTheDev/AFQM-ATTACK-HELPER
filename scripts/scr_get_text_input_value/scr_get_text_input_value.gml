@@ -507,3 +507,15 @@ function scr_refresh_text_input_display()
         current_input = string(scr_get_text_input_value(attatched_id));
     }
 }
+
+function scr_refresh_text_input_group(_group)
+{
+    with (obj_text_input)
+    {
+        if (input_group == _group)
+        {
+            scr_refresh_text_input_display();
+        }
+    }
+}
+

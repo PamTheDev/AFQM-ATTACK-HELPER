@@ -142,7 +142,7 @@ create_panel_input(
 
 text_y = panel_y + 97;
 
-/*create_code_box_input(
+create_code_box_input(
     200,
     panel_x + 30,
     panel_y + 420,
@@ -150,7 +150,7 @@ text_y = panel_y + 97;
     5,
     "flag"
 );
-
+/*
 create_panel_input(
     201,
     panel_x + 30,

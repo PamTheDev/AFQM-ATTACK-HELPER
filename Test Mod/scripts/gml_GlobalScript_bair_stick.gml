@@ -1,4 +1,4 @@
-﻿function bair_stick()
+function bair_stick()
 {
     var run = true;
     var prevPhase = attack_phase;

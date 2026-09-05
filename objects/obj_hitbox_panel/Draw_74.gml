@@ -56,6 +56,11 @@ switch (_focus) {
 
 		break;
 	}
+	case "phase":{
+		draw_set_colour(c_white)
+		var text_y = panel_y + 100
+		draw_text(panel_x + 20, text_y, input_labels.anim[0])
+	}
 
 }
 }
