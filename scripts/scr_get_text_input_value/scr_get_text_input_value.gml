@@ -33,6 +33,23 @@ function scr_get_text_input_value(_id)
         case 8: return scr_get_selected_hitbox_number_value("hitlag", 0);
         case 9: return scr_get_selected_hitbox_number_value("angle", 0);
 		case 10: return scr_get_selected_hitbox_key_duration();
+
+        // Hit VFX dropdown
+        case 11:
+        {
+            var hb = scr_get_selected_hitbox();
+
+            if (!is_undefined(hb))
+            {
+                if (variable_struct_exists(hb, "vfxStyle"))
+                {
+                    return scr_get_hit_vfx_index(hb.vfxStyle);
+                }
+            }
+
+            return 0;
+        }
+
         // Animation frame properties
         case 100: return scr_get_selected_animation_key_number_value("start", 0);
         case 101: return scr_get_selected_animation_key_number_value("animation_frame", 0);
@@ -144,6 +161,21 @@ function scr_update_text_input(_id, _input)
         case 10:
 			scr_set_selected_hitbox_key_duration(_input);
 			break;
+
+        case 11:
+        {
+            var hb = scr_get_selected_hitbox();
+
+            if (!is_undefined(hb))
+            {
+                hb.vfxStyle = scr_get_hit_vfx_from_index(_input);
+
+                mark_attack_json_dirty();
+                scr_save_current_attack_json();
+            }
+
+            break;
+        }
 			
 		case 100:
 			scr_set_selected_animation_key_number_value("start", _input);
@@ -208,6 +240,14 @@ function scr_initiate_text_value(_id, _input = "", _array = "")
             break;
         }
 
+        // Hit VFX dropdown
+        case 11:
+        {
+            text_input_type = "dropdown";
+            numbers_only = false;
+            break;
+        }
+
         
         // Numeric hitbox inputs
         case 200:
@@ -242,6 +282,9 @@ function scr_get_text_list(_id)
     {
         case 0:
             return scr_get_hitbox_function_list();
+
+        case 11:
+            return scr_get_hit_vfx_list();
     }
 
     return [];
@@ -279,6 +322,57 @@ function scr_get_hitbox_function_from_index(_index)
 
     return list[_index];
 }
+
+function scr_get_hit_vfx_list()
+{
+    return [
+        "normal_weak",
+        "normal_medium",
+        "normal_strong",
+        "slash_weak",
+        "slash_medium",
+        "slash_strong",
+        "electric_weak",
+        "electric",
+        "magic",
+        "grab",
+        "explosion",
+        "splash",
+        "shield",
+        "shield_projectile",
+        "spin",
+        "lines",
+        "emphasis",
+        "shine",
+        "custom",
+        "none"
+    ];
+}
+
+function scr_get_hit_vfx_index(_vfx_style)
+{
+    var list = scr_get_hit_vfx_list();
+
+    for (var i = 0; i < array_length(list); i++)
+    {
+        if (_vfx_style == list[i] || _vfx_style == "HIT_VFX." + list[i])
+        {
+            return i;
+        }
+    }
+
+    return 0;
+}
+
+function scr_get_hit_vfx_from_index(_index)
+{
+    var list = scr_get_hit_vfx_list();
+
+    _index = clamp(floor(real(_index)), 0, array_length(list) - 1);
+
+    return "HIT_VFX." + list[_index];
+}
+
 function scr_get_selected_hitbox()
 {
     if (!variable_global_exists("selected_hitbox"))
@@ -518,4 +612,3 @@ function scr_refresh_text_input_group(_group)
         }
     }
 }
-

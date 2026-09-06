@@ -13,6 +13,7 @@ function scr_text_input_get_property_name(_id)
         case 8: return "hitlag";
         case 9: return "angle";
         case 10: return "duration";
+        case 11: return "vfxStyle";
     }
 
     return "";
@@ -114,6 +115,20 @@ function scr_text_input_write_target_value(_id, _target, _value)
             {
                 _target.hitbox.lasts = duration;
             }
+        }
+
+        return true;
+    }
+
+    if (_id == 11)
+    {
+        if (is_string(_value))
+        {
+            _target.vfxStyle = _value;
+        }
+        else
+        {
+            _target.vfxStyle = scr_get_hit_vfx_from_index(_value);
         }
 
         return true;

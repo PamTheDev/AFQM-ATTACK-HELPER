@@ -15,6 +15,61 @@ var my = device_mouse_y_to_gui(0);
 var input_w = 32 * image_xscale;
 var input_h = 32 * image_yscale;
 
+// Instances of this object share a draw depth. If another input overlaps an
+// open dropdown, do not draw that covered input over the option list. This is
+// independent of GameMaker's instance draw order and works on the opening frame.
+if (
+    global.text_input_instance != noone &&
+    global.text_input_instance != id &&
+    instance_exists(global.text_input_instance)
+)
+{
+    var open_dropdown_input = global.text_input_instance;
+
+    if (open_dropdown_input.text_input_type == "dropdown")
+    {
+        var open_dropdown_count = array_length(open_dropdown_input.current_list);
+
+        if (open_dropdown_count > 0)
+        {
+            var open_input_w = 32 * open_dropdown_input.image_xscale;
+            var open_input_h = 32 * open_dropdown_input.image_yscale;
+            var open_option_h = open_input_h;
+            var open_dropdown_y = open_dropdown_input.y + open_input_h;
+            var open_dropdown_full_h = open_option_h * open_dropdown_count;
+            var open_gui_h = display_get_gui_height();
+
+            if (
+                open_dropdown_y + open_dropdown_full_h > open_gui_h &&
+                open_dropdown_input.y > open_gui_h - open_dropdown_y
+            )
+            {
+                open_option_h = max(
+                    16,
+                    min(
+                        open_input_h,
+                        floor(open_dropdown_input.y / open_dropdown_count)
+                    )
+                );
+
+                open_dropdown_y = open_dropdown_input.y - open_option_h * open_dropdown_count;
+            }
+
+            var covered_by_dropdown =
+                x < open_dropdown_input.x + open_input_w &&
+                x + input_w > open_dropdown_input.x &&
+                y < open_dropdown_y + open_option_h * open_dropdown_count &&
+                y + input_h > open_dropdown_y;
+
+            if (covered_by_dropdown)
+            {
+                highlighted = false;
+                exit;
+            }
+        }
+    }
+}
+
 highlighted =
     mx >= x &&
     mx <= x + input_w &&
@@ -22,6 +77,41 @@ highlighted =
     my <= y + input_h;
 
 var clicked = mouse_check_button_pressed(mb_left);
+
+// An open dropdown is modal to the other text inputs. Without this guard, an
+// input underneath an option can take focus before the option handles the click.
+if (
+    global.text_input_instance != noone &&
+    global.text_input_instance != id &&
+    instance_exists(global.text_input_instance)
+)
+{
+    var focused_input = global.text_input_instance;
+
+    if (focused_input.text_input_type == "dropdown")
+    {
+        highlighted = false;
+        clicked = false;
+    }
+}
+
+// Keep long dropdowns inside the GUI. Short dropdowns retain their existing
+// downward-opening layout and full-height rows.
+var dropdown_option_h = input_h;
+var dropdown_y = y + input_h;
+
+if (text_input_type == "dropdown" && array_length(current_list) > 0)
+{
+    var dropdown_count = array_length(current_list);
+    var dropdown_full_h = dropdown_option_h * dropdown_count;
+    var gui_h = display_get_gui_height();
+
+    if (dropdown_y + dropdown_full_h > gui_h && y > gui_h - dropdown_y)
+    {
+        dropdown_option_h = max(16, min(input_h, floor(y / dropdown_count)));
+        dropdown_y = y - dropdown_option_h * dropdown_count;
+    }
+}
 
 
 
@@ -36,17 +126,16 @@ if (
 {
     var bx = x;
     var bw = 32 * image_xscale;
-    var bh = 32 * image_yscale;
 
     for (var i = 0; i < array_length(current_list); i++)
     {
-        var option_y = y + bh * (i + 1);
+        var option_y = dropdown_y + dropdown_option_h * i;
 
         var mouse_hover_option =
             mx >= bx &&
             mx <= bx + bw &&
             my >= option_y &&
-            my <= option_y + bh;
+            my <= option_y + dropdown_option_h;
 
         if (mouse_hover_option)
         {
@@ -120,10 +209,9 @@ if (
     {
         var dbx = x;
         var dbw = 32 * image_xscale;
-        var dbh = 32 * image_yscale;
 
-        var dropdown_top = y + dbh;
-        var dropdown_bottom = y + dbh * (array_length(current_list) + 1);
+        var dropdown_top = dropdown_y;
+        var dropdown_bottom = dropdown_y + dropdown_option_h * array_length(current_list);
 
         clicked_dropdown_area =
             mx >= dbx &&
@@ -175,17 +263,16 @@ if (text_input_type == "dropdown" && global.text_input_instance == id)
 {
     var bx2 = x;
     var bw2 = 32 * image_xscale;
-    var bh2 = 32 * image_yscale;
 
     for (var d = 0; d < array_length(current_list); d++)
     {
-        var option_y2 = y + bh2 * (d + 1);
+        var option_y2 = dropdown_y + dropdown_option_h * d;
 
         var mouse_hover_button =
             mx >= bx2 &&
             mx <= bx2 + bw2 &&
             my >= option_y2 &&
-            my <= option_y2 + bh2;
+            my <= option_y2 + dropdown_option_h;
 
         draw_set_colour(c_dkgray);
 		
@@ -198,7 +285,7 @@ if (text_input_type == "dropdown" && global.text_input_instance == id)
             bx2,
             option_y2,
             bx2 + bw2,
-            option_y2 + bh2,
+            option_y2 + dropdown_option_h,
             false
         );
 
