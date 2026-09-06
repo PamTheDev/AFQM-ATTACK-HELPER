@@ -12,30 +12,55 @@ draw_text_transformed(panel_x+10, panel_y + 27, "Edit Panel",2,2,0)
 if (variable_global_exists("menu_focus"))
 {
 switch (_focus) {
+	
 	default:
 		break;
-	case "hitbox":
-	draw_set_colour(c_white)
-//Hitbox, X and Y labels
-	var text_y = panel_y + 100
-	draw_text(panel_x + 20, text_y, input_labels[0])
+	case "hitbox":{
+		draw_set_colour(c_white)
+		//Hitbox, X and Y labels
+		var text_y = panel_y + 100
+		draw_text(panel_x + 20, text_y, input_labels.hit[0])
 
-	text_y += 35
-	draw_text(panel_x + 20, text_y, "Position:")
-	draw_text(panel_x + 140, text_y, "X")
-	draw_text(panel_x + 245, text_y, "Y")
+		text_y += 35
+		draw_text(panel_x + 20, text_y, "Position:")
+		draw_text(panel_x + 140, text_y, "X")
+		draw_text(panel_x + 245, text_y, "Y")
 
-	text_y += 35
-	draw_text(panel_x + 20, text_y, "Scale:")
-	draw_text(panel_x + 140, text_y, "X")
-	draw_text(panel_x + 245, text_y, "Y")
+		text_y += 35
+		draw_text(panel_x + 20, text_y, "Scale:")
+		draw_text(panel_x + 140, text_y, "X")
+		draw_text(panel_x + 245, text_y, "Y")
 
-	for (var i = 5; i <= array_length(input_labels)-1; i++)
-	{
-		text_y = panel_y + 70 + i*35
-		draw_text(panel_x + 20, text_y, input_labels[i])
+		for (var i = 5; i <= array_length(input_labels.hit)-1; i++)
+		{
+			text_y = panel_y + 70 + i*35
+			draw_text(panel_x + 20, text_y, input_labels.hit[i])
+		}
+		break;
 	}
-	break;
+	case "frame": {
+		draw_set_colour(c_white)
+		var text_y = panel_y + 100
+		draw_text(panel_x + 20, text_y, input_labels.anim[0])
+		text_y += 35
+		draw_text(panel_x + 20, text_y, input_labels.anim[1])
+
+		break;
+	}
+	case "flag": {
+		draw_set_colour(c_white)
+		var text_y = panel_y + 100
+		draw_text(panel_x + 20, text_y, input_labels.anim[0])
+		text_y += 35
+		draw_text(panel_x + 20, text_y, input_labels.anim[1])
+
+		break;
+	}
+	case "phase":{
+		draw_set_colour(c_white)
+		var text_y = panel_y + 100
+		draw_text(panel_x + 20, text_y, input_labels.anim[0])
+	}
 
 }
 }

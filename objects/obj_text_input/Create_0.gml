@@ -39,3 +39,8 @@ text_input_undo_property = "";
 input_group = "default";
 input_enabled = true;
 text_input_ready = false;
+
+code_indent = "    "; // 4 spaces
+code_line_height = 18;
+code_padding = 6;
+code_scroll_y = 0;

@@ -1,0 +1,13 @@
+{
+  "$GMScript":"v1",
+  "%Name":"codebox_tools",
+  "isCompatibility":false,
+  "isDnD":false,
+  "name":"codebox_tools",
+  "parent":{
+    "name":"Scripts",
+    "path":"folders/Scripts.yy",
+  },
+  "resourceType":"GMScript",
+  "resourceVersion":"2.0",
+}

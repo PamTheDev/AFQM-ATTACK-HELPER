@@ -51,7 +51,11 @@ function scr_run_gif_converter(_gif_path, _sprite_root)
         show_debug_message("ERROR: Sprite root does not exist.");
         return false;
     }
-
+	
+	
+	convert_gif_gml(_gif_path, _sprite_root);
+	
+	/*
     var command =
         "cmd.exe /C \"\"" +
         converter_path + "\" \"" +
@@ -63,9 +67,11 @@ function scr_run_gif_converter(_gif_path, _sprite_root)
     show_debug_message(command);
 
     global.gif_converter_process = ProcessExecuteAsync(command);
-
+	
     show_debug_message("xProcess returned:");
     show_debug_message(string(global.gif_converter_process));
-
+	*/
+	
+	
     return true;
 }

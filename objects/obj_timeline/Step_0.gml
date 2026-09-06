@@ -76,13 +76,13 @@ var mouse_in_phase_area = point_in_rectangle(
 // M = merge selected phase with next phase
 
 
-if (selected_phase_index >= 0)
+if (global.selected_phase_index >= 0)
 {
     if (keyboard_check_pressed(ord("N")))
     {
-selected_phase_index = scr_timeline_add_phase_after(
+global.selected_phase_index = scr_timeline_add_phase_after(
     global.timeline,
-    selected_phase_index,
+    global.selected_phase_index,
     new_phase_default_duration
 );
 
@@ -94,10 +94,10 @@ exit;
 
     if (keyboard_check_pressed(ord("M")))
     {
-scr_timeline_merge_phase_with_next(global.timeline, selected_phase_index);
+scr_timeline_merge_phase_with_next(global.timeline, global.selected_phase_index);
 
-selected_phase_index = clamp(
-    selected_phase_index,
+global.selected_phase_index = clamp(
+    global.selected_phase_index,
     0,
     max(0, array_length(global.timeline.phases) - 1)
 );
@@ -165,7 +165,7 @@ if (phase_drag_mode != "none")
 
 if (mouse_in_phase_area && mouse_check_button_pressed(mb_left))
 {
-    selected_phase_index = -1;
+    global.selected_phase_index = -1;
 
     phase_drag_mode = "none";
     phase_drag_index = -1;
@@ -183,7 +183,7 @@ if (mouse_in_phase_area && mouse_check_button_pressed(mb_left))
 
         if (over_left && p > 0)
         {
-            selected_phase_index = p;
+            global.selected_phase_index = p;
             phase_drag_index = p;
             phase_drag_mode = "left";
 
@@ -192,7 +192,7 @@ if (mouse_in_phase_area && mouse_check_button_pressed(mb_left))
         }
         else if (over_right)
         {
-            selected_phase_index = p;
+            global.selected_phase_index = p;
             phase_drag_index = p;
             phase_drag_mode = "right";
 
@@ -201,8 +201,8 @@ if (mouse_in_phase_area && mouse_check_button_pressed(mb_left))
         }
         else if (inside_phase)
         {
-            selected_phase_index = p;
-
+            global.selected_phase_index = p;
+			//scr_show_only_text_input_group("phase");
             show_debug_message("Selected phase:");
             show_debug_message(timeline.phases[p].name);
             break;
@@ -260,6 +260,7 @@ if (mouse_over_timeline)
 if (mouse_over_timeline && mouse_check_button_pressed(mb_left))
 {
     selected_track = -1;
+	global.selected_phase_index = -1;
     selected_key = -1;
     drag_mode = "";
 
@@ -306,6 +307,7 @@ if (mouse_over_timeline && mouse_check_button_pressed(mb_left))
 				if (track.type == "animation")
 				{
 					scr_clear_hitbox_selection();
+					scr_clear_flag_selection();
 
 					scr_toggle_select_animation_key(timeline, t, k);
 
@@ -321,14 +323,33 @@ if (mouse_over_timeline && mouse_check_button_pressed(mb_left))
 				else if (track.type == "hitbox")
 					{
 					scr_clear_animation_selection();
+					scr_clear_flag_selection();
 
 					scr_select_hitbox_key(timeline, t, k);
 					scr_show_only_text_input_group("hitbox");
+				}
+				else if (track.type == "flag")
+				{
+					scr_clear_animation_selection();
+					scr_clear_hitbox_selection();
+
+					scr_toggle_select_flag_key(timeline, t, k);
+
+					if (!is_undefined(global.selected_flag_key))
+					{
+						scr_show_only_text_input_group("flag");
+						scr_refresh_text_input_group("flag");
+					}
+					else
+					{
+						scr_hide_all_text_input_groups();
+					}
 				}
 				else
 				{
 					scr_clear_animation_selection();
 					scr_clear_hitbox_selection();
+					scr_clear_flag_selection();
 					scr_hide_all_text_input_groups();
 				}
 
@@ -353,7 +374,7 @@ if (mouse_over_timeline && mouse_check_button_pressed(mb_left))
 
                 var inside_resize_handle = mx >= key_x + key_w - resize_handle_w;
 
-                if (inside_resize_handle && track.type != "animation")
+                if (inside_resize_handle && track.type != "animation" && track.type != "flag")
                 {
                     drag_mode = "resize";
                     show_debug_message("Timeline key resize started.");
@@ -378,7 +399,7 @@ if (mouse_over_timeline && mouse_check_button_pressed(mb_left))
     if (!found_key)
     {
         var new_track_row_y = track_start_y + array_length(timeline.tracks) * track_h - scroll_y;
-		
+		scr_clear_flag_selection();
 		scr_clear_hitbox_selection();
 		scr_clear_animation_selection();
 		scr_hide_all_text_input_groups();
@@ -461,7 +482,7 @@ if (mouse_check_button(mb_left))
 
             active_key.start = new_start;
 
-            if (active_track.type == "animation")
+            if (active_track.type == "animation" || active_track.type == "flag")
             {
                 active_key.duration = 1;
             }
@@ -610,7 +631,15 @@ if (mouse_check_button_released(mb_left))
     selected_key = -1;
 }
 
-if (!is_undefined(global.selected_animation_key))
+if (global.selected_phase_index >= 0)
+{
+    scr_show_only_text_input_group("phase");
+}
+else if (!is_undefined(global.selected_flag_key))
+{
+    scr_show_only_text_input_group("flag");
+}
+else if (!is_undefined(global.selected_animation_key))
 {
     scr_show_only_text_input_group("frame");
 }

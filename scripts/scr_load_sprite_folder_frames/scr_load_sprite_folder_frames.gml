@@ -10,13 +10,15 @@ function scr_load_sprite_folder_frames(_folder_path, _sprite_folder_name)
     {
         // Try 0-based filename first:
         // spr_name_0.png
-        var png_path = _folder_path + _sprite_folder_name + "_" + string(index) + ".png";
-
+        //var png_path = _folder_path + _sprite_folder_name + "_" + string(index) + ".png";
+		
+		var png_path = _folder_path + generate_image_name(index) + ".png";
+		
         // If that does not exist, try 1-based filename:
         // spr_name_1.png
         if (!file_exists(png_path))
         {
-            png_path = _folder_path + _sprite_folder_name + "_" + string(index + 1) + ".png";
+            png_path = _folder_path + generate_image_name(index+1) + ".png";
         }
 
         if (!file_exists(png_path))
