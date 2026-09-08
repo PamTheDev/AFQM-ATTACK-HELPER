@@ -63,6 +63,10 @@ if (global.text_input_instance == id)
 
         scr_update_text_input(attatched_id, input_string);
     }
+    else if (text_input_type == "codebox")
+    {
+        scr_codebox_update_input(attatched_id);
+    }
 }
 else
 {

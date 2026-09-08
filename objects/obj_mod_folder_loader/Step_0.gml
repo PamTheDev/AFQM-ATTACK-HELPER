@@ -38,15 +38,17 @@ if (loader_state == "find_sprite_root")
     show_debug_message("Sprite root found:");
     show_debug_message(sprite_root);
 
+	png_files = scr_collect_sprite_png(sprite_root);
     gif_files = scr_collect_sprite_gifs(sprite_root);
+	image_files = array_concat(gif_files, png_files);
     gif_index = 0;
     gif_conversion_started = false;
     gif_wait_frames = 0;
 
     show_debug_message("GIF files found:");
-    show_debug_message(string(array_length(gif_files)));
+    show_debug_message(string(array_length(image_files)));
 
-    if (array_length(gif_files) > 0)
+    if (array_length(image_files) > 0)
     {
         loader_state = "convert_gifs";
     }
@@ -65,7 +67,7 @@ if (loader_state == "find_sprite_root")
 
 if (loader_state == "convert_gifs")
 {
-    var gif_total = array_length(gif_files);
+    var gif_total = array_length(image_files);
 
     if (gif_total <= 0)
     {
@@ -80,7 +82,7 @@ if (loader_state == "convert_gifs")
         exit;
     }
 
-    var gif_path = gif_files[gif_index];
+    var gif_path = image_files[gif_index];
     var done_path = scr_get_gif_conversion_done_path(gif_path, sprite_root);
 
     load_text = "Converting GIF " + string(gif_index + 1) + " / " + string(gif_total);
