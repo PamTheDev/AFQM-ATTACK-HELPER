@@ -14,6 +14,7 @@ function scr_text_input_get_property_name(_id)
         case 9: return "angle";
         case 10: return "duration";
         case 11: return "vfxStyle";
+        case 12: return "sfx";
     }
 
     return "";
@@ -64,6 +65,16 @@ function scr_text_input_read_target_value(_id, _target)
         }
 
         return 1;
+    }
+
+    if (_id == 12)
+    {
+        if (variable_struct_exists(_target, "sfx"))
+        {
+            return string(_target.sfx);
+        }
+
+        return "";
     }
 
     var prop = scr_text_input_get_property_name(_id);
@@ -131,6 +142,12 @@ function scr_text_input_write_target_value(_id, _target, _value)
             _target.vfxStyle = scr_get_hit_vfx_from_index(_value);
         }
 
+        return true;
+    }
+
+    if (_id == 12)
+    {
+        _target.sfx = string(_value);
         return true;
     }
 

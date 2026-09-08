@@ -147,6 +147,17 @@ function scr_build_timeline_from_attack(_attack)
                     {
                         var hb = frame_data.hitboxes[h];
 
+                        // SFX values are GML sound references/expressions. Normalize legacy
+                        // numeric JSON values to strings so subsequent saves preserve the type.
+                        if (variable_struct_exists(hb, "sfx"))
+                        {
+                            hb.sfx = string(hb.sfx);
+                        }
+                        else
+                        {
+                            hb.sfx = "";
+                        }
+
                         var track_index = h + 1;
 
                         if (variable_struct_exists(hb, "id"))

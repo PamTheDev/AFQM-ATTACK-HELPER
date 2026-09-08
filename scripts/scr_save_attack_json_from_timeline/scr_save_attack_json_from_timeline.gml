@@ -225,9 +225,15 @@ for (var t = 0; t < array_length(_timeline.tracks); t++)
 
     var json_text = json_stringify(output);
 
-    var file = file_text_open_write(_json_path);
-    file_text_write_string(file, json_text);
-    file_text_close(file);
+    // libfilesystem's text writer can terminate the Windows runner when the
+    // editor performs several autosaves close together. Attack JSON lives in
+    // GameMaker's writable local-data area, so use the built-in buffer writer.
+    var json_buffer_size = max(1, string_byte_length(json_text));
+    var json_buffer = buffer_create(json_buffer_size, buffer_fixed, 1);
+
+    buffer_write(json_buffer, buffer_text, json_text);
+    buffer_save(json_buffer, _json_path);
+    buffer_delete(json_buffer);
 
     global.current_attack_data = output;
     global.attack_json_dirty = false;

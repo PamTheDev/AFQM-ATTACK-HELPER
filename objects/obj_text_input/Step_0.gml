@@ -59,9 +59,15 @@ if (global.text_input_instance == id)
         }
 
         keyboard_string = input_string;
-        current_input = input_string;
 
-        scr_update_text_input(attatched_id, input_string);
+        // Do not dispatch the same value every Step. Several input setters save
+        // JSON, and repeatedly opening the same file can overwhelm the native
+        // filesystem extension while an input remains focused.
+        if (input_string != current_input)
+        {
+            current_input = input_string;
+            scr_update_text_input(attatched_id, input_string);
+        }
     }
     else if (text_input_type == "codebox")
     {

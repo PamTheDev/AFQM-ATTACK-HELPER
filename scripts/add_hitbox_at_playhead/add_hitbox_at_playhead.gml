@@ -123,7 +123,7 @@ function scr_add_hitbox_at_playhead(_timeline, _x, _y, _xScale, _yScale, _type)
         kbg: 0,
 
         vfxStyle: "",
-        sfx: 0
+        sfx: ""
     };
 
     var new_key = {

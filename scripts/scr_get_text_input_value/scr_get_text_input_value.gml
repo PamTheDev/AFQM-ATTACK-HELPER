@@ -50,6 +50,24 @@ function scr_get_text_input_value(_id)
             return 0;
         }
 
+        // Hit SFX text
+        case 12:
+        {
+            var hb = scr_get_selected_hitbox();
+
+            if (is_undefined(hb))
+            {
+                return "";
+            }
+
+            if (!variable_struct_exists(hb, "sfx"))
+            {
+                hb.sfx = "";
+            }
+
+            return string(hb.sfx);
+        }
+
         // Animation frame properties
         case 100: return scr_get_selected_animation_key_number_value("start", 0);
         case 101: return scr_get_selected_animation_key_number_value("animation_frame", 0);
@@ -176,6 +194,33 @@ function scr_update_text_input(_id, _input)
 
             break;
         }
+
+        case 12:
+        {
+            var hb = scr_get_selected_hitbox();
+
+            if (!is_undefined(hb))
+            {
+                var new_sfx = string(_input);
+                var sfx_changed = true;
+
+                if (variable_struct_exists(hb, "sfx"))
+                {
+                    sfx_changed = string(hb.sfx) != new_sfx;
+                }
+
+                if (sfx_changed)
+                {
+                    hb.sfx = new_sfx;
+
+                    // The undo/focus-finish path commits this edit to disk once.
+                    // Avoid calling the native filesystem extension per keystroke.
+                    mark_attack_json_dirty();
+                }
+            }
+
+            break;
+        }
 			
 		case 100:
 			scr_set_selected_animation_key_number_value("start", _input);
@@ -244,6 +289,14 @@ function scr_initiate_text_value(_id, _input = "", _array = "")
         case 11:
         {
             text_input_type = "dropdown";
+            numbers_only = false;
+            break;
+        }
+
+        // Hit SFX is a sound asset name or another GML expression.
+        case 12:
+        {
+            text_input_type = "input";
             numbers_only = false;
             break;
         }
