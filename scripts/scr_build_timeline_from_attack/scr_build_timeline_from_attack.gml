@@ -54,6 +54,7 @@ function scr_build_timeline_from_attack(_attack)
         // That is 17 timeline frames.
         var phase_length = phase_lasts + 1;
 
+        var phase_flags = [];
 
         if (variable_struct_exists(phase, "flags"))
         {
@@ -87,16 +88,9 @@ function scr_build_timeline_from_attack(_attack)
                     phase_flag.scope = "phase";
                 }
 
-                array_push(flag_track.keys, {
-                    start: phase_start,
-                    duration: 1,
-
-                    flag: phase_flag,
-
-                    phase_index: p,
-                    source_countdown_frame: phase_lasts,
-                    source_phase: phase
-                });
+                // Phase flags belong to the phase itself and are edited from
+                // the phase panel. Only frame flags appear on the Flags track.
+                array_push(phase_flags, phase_flag);
             }
         }
 
@@ -156,6 +150,13 @@ function scr_build_timeline_from_attack(_attack)
                         else
                         {
                             hb.sfx = "";
+                        }
+
+                        // Older attack JSON may not include a hitbox group.
+                        // Normalize it here so every hitbox in the editor has one.
+                        if (!variable_struct_exists(hb, "group"))
+                        {
+                            hb.group = 0;
                         }
 
                         var track_index = h + 1;
@@ -255,7 +256,8 @@ function scr_build_timeline_from_attack(_attack)
             start: phase_start,
             duration: phase_length,
             phase_index: p,
-            lasts: max(0, phase_length - 1)
+            lasts: max(0, phase_length - 1),
+            flags: phase_flags
         });
 
         phase_start += phase_length;

@@ -15,6 +15,8 @@ function scr_text_input_get_property_name(_id)
         case 10: return "duration";
         case 11: return "vfxStyle";
         case 12: return "sfx";
+        case 13: return "group";
+        case 300: return "flags";
     }
 
     return "";
@@ -23,6 +25,11 @@ function scr_text_input_get_property_name(_id)
 
 function scr_text_input_get_undo_target(_id)
 {
+    if (_id == 300)
+    {
+        return scr_get_selected_phase();
+    }
+
     if (_id == 10)
     {
         if (variable_global_exists("selected_hitbox_key"))
@@ -75,6 +82,11 @@ function scr_text_input_read_target_value(_id, _target)
         }
 
         return "";
+    }
+
+    if (_id == 300)
+    {
+        return scr_get_phase_flags_code(_target);
     }
 
     var prop = scr_text_input_get_property_name(_id);
@@ -149,6 +161,11 @@ function scr_text_input_write_target_value(_id, _target, _value)
     {
         _target.sfx = string(_value);
         return true;
+    }
+
+    if (_id == 300)
+    {
+        return scr_set_phase_flags_code(_target, _value);
     }
 
     var prop = scr_text_input_get_property_name(_id);

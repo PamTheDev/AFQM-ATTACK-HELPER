@@ -29,7 +29,8 @@ input_labels = {
     "Angle:",
     "Duration:",
     "vfxStyle:",
-    "sfx:"
+    "sfx:",
+    "Group:"
 	],
 	anim :[
 	"On Frame:",
@@ -105,7 +106,7 @@ create_panel_input(4, panel_x + 260, text_y, 2.5,
 		"hitbox");
 
 // Other hitbox properties
-// IDs 5 through 12
+// IDs 5 through 13
 
 
 for (var i = 5; i <= array_length(input_labels.hit) - 1; i++)
@@ -149,6 +150,16 @@ create_code_box_input(
     9.25,
     5,
     "flag"
+);
+
+// Phase code uses the same temporary code-box editor as frame flags.
+create_code_box_input(
+    300,
+    panel_x + 30,
+    panel_y + 420,
+    9.25,
+    5,
+    "phase"
 );
 /*
 create_panel_input(

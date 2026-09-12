@@ -63,6 +63,37 @@ function scr_save_attack_json_from_timeline(_timeline, _json_path)
             json_phase.or = timeline_phase.or;
         }
 
+        if (variable_struct_exists(timeline_phase, "flags"))
+        {
+            for (var pf = 0; pf < array_length(timeline_phase.flags); pf++)
+            {
+                var phase_flag_data = timeline_phase.flags[pf];
+                var phase_flag_code = "";
+
+                if (is_string(phase_flag_data))
+                {
+                    phase_flag_code = phase_flag_data;
+                }
+                else if (is_struct(phase_flag_data) && variable_struct_exists(phase_flag_data, "code"))
+                {
+                    phase_flag_code = string(phase_flag_data.code);
+                }
+
+                if (phase_flag_code == "") continue;
+
+                if (!variable_struct_exists(json_phase, "flags"))
+                {
+                    json_phase.flags = [];
+                }
+
+                array_push(json_phase.flags, {
+                    type: "code",
+                    code: phase_flag_code,
+                    scope: "phase"
+                });
+            }
+        }
+
         array_push(output.phases, json_phase);
     }
 
@@ -138,6 +169,13 @@ function scr_save_attack_json_from_timeline(_timeline, _json_path)
 
             hb.lasts = max(1, round(key.duration));
 
+            // Guarantee the serialized hitbox schema includes a group, including
+            // hitboxes created by older versions of the editor.
+            if (!variable_struct_exists(hb, "group"))
+            {
+                hb.group = 0;
+            }
+
             array_push(json_frame.hitboxes, hb);
         }
     }
@@ -178,23 +216,45 @@ for (var t = 0; t < array_length(_timeline.tracks); t++)
         var timeline_phase = _timeline.phases[phase_index];
         var json_phase = output.phases[phase_index];
 
-        var local_frame = key.start - timeline_phase.start;
-        local_frame = clamp(local_frame, 0, timeline_phase.duration - 1);
+        var flag_scope = "frame";
 
-        var countdown_frame = timeline_phase.lasts - local_frame;
-
-        var json_frame = scr_get_or_create_json_frame(json_phase, countdown_frame);
-
-        if (!variable_struct_exists(json_frame, "flags"))
+        if (variable_struct_exists(key.flag, "scope"))
         {
-            json_frame.flags = [];
+            flag_scope = key.flag.scope;
         }
 
-        array_push(json_frame.flags, {
-            type: "code",
-            code: key.flag.code,
-            scope: "frame"
-        });
+        if (flag_scope == "phase")
+        {
+            if (!variable_struct_exists(json_phase, "flags"))
+            {
+                json_phase.flags = [];
+            }
+
+            array_push(json_phase.flags, {
+                type: "code",
+                code: key.flag.code,
+                scope: "phase"
+            });
+        }
+        else
+        {
+            var local_frame = key.start - timeline_phase.start;
+            local_frame = clamp(local_frame, 0, timeline_phase.duration - 1);
+
+            var countdown_frame = timeline_phase.lasts - local_frame;
+            var json_frame = scr_get_or_create_json_frame(json_phase, countdown_frame);
+
+            if (!variable_struct_exists(json_frame, "flags"))
+            {
+                json_frame.flags = [];
+            }
+
+            array_push(json_frame.flags, {
+                type: "code",
+                code: key.flag.code,
+                scope: "frame"
+            });
+        }
     }
 }
 

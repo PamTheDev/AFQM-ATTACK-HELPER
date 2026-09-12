@@ -21,7 +21,8 @@ function scr_timeline_ensure_phases(_timeline)
             start: 0,
             duration: len,
             phase_index: 0,
-            lasts: max(0, len - 1)
+            lasts: max(0, len - 1),
+            flags: []
         });
     }
 }
@@ -94,6 +95,11 @@ function scr_timeline_refresh_phase_indices(_timeline)
 
         phase.duration = max(1, round(phase.duration));
         phase.lasts = max(0, phase.duration - 1);
+
+        if (!variable_struct_exists(phase, "flags"))
+        {
+            phase.flags = [];
+        }
 
         _timeline.phases[i] = phase;
     }
@@ -212,7 +218,8 @@ function scr_timeline_add_phase_after(_timeline, _phase_index, _duration)
         start: insert_start,
         duration: _duration,
         phase_index: insert_index,
-        lasts: max(0, _duration - 1)
+        lasts: max(0, _duration - 1),
+        flags: []
     };
 
     array_insert(_timeline.phases, insert_index, new_phase);
@@ -236,6 +243,16 @@ function scr_timeline_merge_phase_with_next(_timeline, _phase_index)
 
     var phase = _timeline.phases[_phase_index];
     var next_phase = _timeline.phases[_phase_index + 1];
+
+    if (!variable_struct_exists(phase, "flags")) phase.flags = [];
+
+    if (variable_struct_exists(next_phase, "flags"))
+    {
+        for (var f = 0; f < array_length(next_phase.flags); f++)
+        {
+            array_push(phase.flags, next_phase.flags[f]);
+        }
+    }
 
     phase.duration += next_phase.duration;
     phase.lasts = max(0, phase.duration - 1);
@@ -373,6 +390,76 @@ function scr_sync_json_phase_lasts_from_timeline(_timeline)
     }
 
     global.attack_json_dirty = true;
+
+    return true;
+}
+
+
+function scr_get_selected_phase()
+{
+    if (!variable_global_exists("timeline")) return undefined;
+    if (!variable_global_exists("selected_phase_index")) return undefined;
+
+    var phase_index = global.selected_phase_index;
+
+    if (phase_index < 0) return undefined;
+    if (phase_index >= array_length(global.timeline.phases)) return undefined;
+
+    return global.timeline.phases[phase_index];
+}
+
+
+function scr_get_phase_flags_code(_phase)
+{
+    if (is_undefined(_phase)) return "";
+
+    if (!variable_struct_exists(_phase, "flags"))
+    {
+        _phase.flags = [];
+    }
+
+    var result = "";
+
+    for (var i = 0; i < array_length(_phase.flags); i++)
+    {
+        var flag_data = _phase.flags[i];
+        var flag_code = "";
+
+        if (is_string(flag_data))
+        {
+            flag_code = flag_data;
+        }
+        else if (is_struct(flag_data) && variable_struct_exists(flag_data, "code"))
+        {
+            flag_code = string(flag_data.code);
+        }
+
+        if (flag_code == "") continue;
+
+        if (result != "") result += "\n";
+        result += flag_code;
+    }
+
+    return result;
+}
+
+
+function scr_set_phase_flags_code(_phase, _code)
+{
+    if (is_undefined(_phase)) return false;
+
+    _code = string(_code);
+    _phase.flags = [];
+
+    if (_code != "")
+    {
+        array_push(_phase.flags, {
+            type: "code",
+            code: _code,
+            scope: "phase",
+            original_line: _code
+        });
+    }
 
     return true;
 }

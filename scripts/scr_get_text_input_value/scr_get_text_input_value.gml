@@ -68,6 +68,9 @@ function scr_get_text_input_value(_id)
             return string(hb.sfx);
         }
 
+        // Hitbox group
+        case 13: return scr_get_selected_hitbox_number_value("group", 0);
+
         // Animation frame properties
         case 100: return scr_get_selected_animation_key_number_value("start", 0);
         case 101: return scr_get_selected_animation_key_number_value("animation_frame", 0);
@@ -88,6 +91,12 @@ function scr_get_text_input_value(_id)
 			return flag.code;
 		}
 		case 201: return global.current_flag_add;
+
+        // Phase flags/code
+        case 300:
+        {
+            return scr_get_phase_flags_code(scr_get_selected_phase());
+        }
 	}
 }
 
@@ -221,6 +230,10 @@ function scr_update_text_input(_id, _input)
 
             break;
         }
+
+        case 13:
+            scr_set_selected_hitbox_number_value("group", _input);
+            break;
 			
 		case 100:
 			scr_set_selected_animation_key_number_value("start", _input);
@@ -243,6 +256,19 @@ function scr_update_text_input(_id, _input)
 
     break;
 }
+        case 300:
+        {
+            var phase = scr_get_selected_phase();
+
+            if (!is_undefined(phase))
+            {
+                scr_set_phase_flags_code(phase, _input);
+                mark_attack_json_dirty();
+                scr_save_current_attack_json();
+            }
+
+            break;
+        }
     }
 }
 
@@ -304,6 +330,7 @@ function scr_initiate_text_value(_id, _input = "", _array = "")
         
         // Numeric hitbox inputs
         case 200:
+        case 300:
 		{
 			text_input_type = "codebox";
 			numbers_only = false;
@@ -319,6 +346,7 @@ function scr_initiate_text_value(_id, _input = "", _array = "")
         case 8:
         case 9:
 		case 10:
+		case 13:
 		case 100:
 		case 101:
         {

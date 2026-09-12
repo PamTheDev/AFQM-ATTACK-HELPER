@@ -117,6 +117,7 @@ function scr_add_hitbox_at_playhead(_timeline, _x, _y, _xScale, _yScale, _type)
 
         angle: 0,
         lasts: key_duration,
+        group: 0,
 
         damage: 0,
         bkb: 0,

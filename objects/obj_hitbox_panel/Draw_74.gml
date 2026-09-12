@@ -58,8 +58,7 @@ switch (_focus) {
 	}
 	case "phase":{
 		draw_set_colour(c_white)
-		var text_y = panel_y + 100
-		draw_text(panel_x + 20, text_y, input_labels.anim[0])
+		draw_text(panel_x + 20, panel_y + 390, "Phase Code:")
 	}
 
 }
