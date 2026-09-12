@@ -262,7 +262,7 @@ function scr_update_text_input(_id, _input)
 
             if (!is_undefined(phase))
             {
-                scr_set_phase_flags_code(phase, _input);
+                scr_set_phase_flags_code(phase, _input, "code");
                 mark_attack_json_dirty();
                 scr_save_current_attack_json();
             }

@@ -145,6 +145,47 @@ function scr_find_flag_key_at_frame(_timeline, _frame)
 
     return undefined;
 }
+function scr_cull_redundant_flags(_timeline)
+{
+	for (var _frame = 0; _frame < array_length(_timeline.total_frames); _frame++)
+    {
+    for (var t = 0; t < array_length(_timeline.tracks); t++)
+    {
+        var track = _timeline.tracks[t];
+
+        if (track.type != "flag")
+        {
+            continue;
+        }
+
+        for (var k = 0; k < array_length(track.keys); k++)
+        {
+            var key = track.keys[k];
+
+            if (key.start == _frame)
+            {
+				if (redundant_flags(key.code))
+					key = 0;
+				
+                //return {track_index: t, key_index: k, key: key};
+            }
+        }
+    }
+	}
+    return undefined;
+	
+}
+
+function redundant_flags(_input){
+	var redundancies = ["anim_frame", "sfx"]
+	for (var i = 0; i < array_length(redundancies); i++)
+	{
+		if (string_pos(redundancies[i], _input))
+			return true;
+	}
+	return false;
+}
+
 function scr_select_flag_key_by_reference(_timeline, _target_key)
 {
     if (is_undefined(_timeline)) return false;

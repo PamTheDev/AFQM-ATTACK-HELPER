@@ -444,17 +444,18 @@ function scr_get_phase_flags_code(_phase)
 }
 
 
-function scr_set_phase_flags_code(_phase, _code)
+function scr_set_phase_flags_code(_phase, _code, _type = "code")
 {
     if (is_undefined(_phase)) return false;
-
+	
     _code = string(_code);
     _phase.flags = [];
-
+	_type = string(_type);
+	
     if (_code != "")
     {
         array_push(_phase.flags, {
-            type: "code",
+            type: _type,
             code: _code,
             scope: "phase",
             original_line: _code

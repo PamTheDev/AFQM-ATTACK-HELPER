@@ -266,6 +266,8 @@ function scr_build_timeline_from_attack(_attack)
     timeline.total_frames = phase_start;
 
     scr_sort_all_timeline_tracks(timeline);
-
+	
+	scr_cull_redundant_flags(timeline)
+	
     return timeline;
 }
