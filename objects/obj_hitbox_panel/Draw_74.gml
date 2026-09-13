@@ -58,6 +58,21 @@ switch (_focus) {
 	}
 	case "phase":{
 		draw_set_colour(c_white)
+
+		var button_x1 = panel_x + 20;
+		var button_y1 = panel_y + 95;
+		var button_x2 = button_x1 + 320;
+		var button_y2 = button_y1 + 42;
+		var mx = device_mouse_x_to_gui(0);
+		var my = device_mouse_y_to_gui(0);
+		var button_hovered = point_in_rectangle(mx, my, button_x1, button_y1, button_x2, button_y2);
+
+		draw_set_colour(button_hovered ? make_color_rgb(80, 100, 125) : make_color_rgb(55, 70, 90));
+		draw_rectangle(button_x1, button_y1, button_x2, button_y2, false);
+		draw_set_colour(c_white);
+		draw_rectangle(button_x1, button_y1, button_x2, button_y2, true);
+		draw_text(button_x1 + 14, button_y1 + 13, "Attack Connected Checks...");
+
 		draw_text(panel_x + 20, panel_y + 390, "Phase Code:")
 	}
 

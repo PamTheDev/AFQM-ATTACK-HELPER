@@ -73,7 +73,16 @@ function scr_undo_last_action()
 		);
 
 		show_debug_message("Undid timeline key edit.");
-	} else if (action.type == "hitbox_property_edit")
+	} else if (action.type == "phase_attack_connected_checks")
+{
+    scr_set_phase_flags_code(action.target, action.before, "code");
+
+    mark_attack_json_dirty();
+    scr_save_current_attack_json();
+
+    show_debug_message("Undid attack-connected check changes.");
+}
+	else if (action.type == "hitbox_property_edit")
 {
     scr_text_input_write_target_value(
         action.input_id,

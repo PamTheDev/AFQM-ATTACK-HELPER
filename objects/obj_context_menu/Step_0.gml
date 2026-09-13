@@ -1,3 +1,15 @@
+if (variable_global_exists("phase_check_window_open") && global.phase_check_window_open)
+{
+    global.context_active = false;
+    exit;
+}
+
+if (variable_global_exists("phase_check_window_open") && global.phase_check_window_open)
+{
+    global.context_active = false;
+    exit;
+}
+
 var mx = device_mouse_x_to_gui(0)
 var my = device_mouse_y_to_gui(0)
 	

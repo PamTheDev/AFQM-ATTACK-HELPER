@@ -1,4 +1,10 @@
 
+if (variable_global_exists("phase_check_window_open") && global.phase_check_window_open)
+{
+    highlighted = false;
+    exit;
+}
+
 var input_w = 32 * image_xscale;
 var input_h = 32 * image_yscale;
 

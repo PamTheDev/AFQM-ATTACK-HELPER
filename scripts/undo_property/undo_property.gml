@@ -86,7 +86,7 @@ function scr_text_input_read_target_value(_id, _target)
 
     if (_id == 300)
     {
-        return scr_get_phase_flags_code(_target);
+        return scr_get_phase_editor_code(_target);
     }
 
     var prop = scr_text_input_get_property_name(_id);
@@ -165,7 +165,7 @@ function scr_text_input_write_target_value(_id, _target, _value)
 
     if (_id == 300)
     {
-        return scr_set_phase_flags_code(_target, _value);
+        return scr_set_phase_editor_code(_target, _value);
     }
 
     var prop = scr_text_input_get_property_name(_id);

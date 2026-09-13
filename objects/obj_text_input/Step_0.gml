@@ -1,3 +1,8 @@
+if (variable_global_exists("phase_check_window_open") && global.phase_check_window_open)
+{
+    exit;
+}
+
 if (!text_input_ready)
 {
     exit;
