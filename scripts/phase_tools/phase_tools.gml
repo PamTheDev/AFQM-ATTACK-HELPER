@@ -469,17 +469,14 @@ function scr_set_phase_flags_code(_phase, _code, _type = "code")
 function scr_get_attack_connected_check_functions()
 {
     return [
+		"check_hit_cancel",
         "check_aerial",
         "check_airdodge",
         "check_crouch",
         "check_dash",
         "check_drop_through",
-        "check_footstool",
         "check_jump",
         "check_landing",
-        "check_ledge_grab",
-        "check_ledge_grab_falling",
-        "check_ledge_tether",
         "check_parried",
         "check_rolling",
         "check_rolling_hold",
