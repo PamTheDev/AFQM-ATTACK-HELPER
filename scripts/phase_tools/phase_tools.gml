@@ -471,33 +471,34 @@ function scr_get_attack_connected_check_functions()
     return [
 		"check_hit_cancel",
         "check_aerial",
-        "check_airdodge",
-        "check_crouch",
-        "check_dash",
         "check_drop_through",
         "check_jump",
         "check_landing",
-        "check_parried",
-        "check_rolling",
-        "check_rolling_hold",
-        "check_run_stop",
-        "check_shield",
-        "check_spot_dodge",
-        "check_tech",
         "check_walk",
-        "check_wall_cling",
-        "check_wall_jump",
-        "check_waveland",
-        "cancel_airdodge_check",
         "cancel_air_check",
-        "cancel_any_action_check",
-        "cancel_charge_check",
-        "cancel_dash_check",
-        "cancel_ground_check",
         "cancel_jump_check"
     ];
 }
 
+
+function scr_get_other_attack_connected_check_functions(){
+	return [
+        "check_crouch",
+        "check_dash",
+        "check_parried",
+        "check_rolling",
+        "check_rolling_hold",
+        "check_run_stop",
+        "check_tech",
+        "check_wall_cling",
+        "check_wall_jump",
+        "check_waveland",
+        "cancel_any_action_check",
+        "cancel_charge_check",
+        "cancel_dash_check",
+        "cancel_ground_check"
+    ];
+}
 
 function scr_phase_compact_code_line(_line)
 {

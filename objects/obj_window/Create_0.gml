@@ -56,7 +56,7 @@ check_functions = scr_get_attack_connected_check_functions();
 check_states = scr_get_phase_attack_connected_check_states(target_phase);
 code_before = scr_get_phase_flags_code(target_phase);
 
-column_count = 2;
+column_count = 1;
 row_count = ceil(array_length(check_functions) / column_count);
 window_w = 900;
 window_h = 650;
