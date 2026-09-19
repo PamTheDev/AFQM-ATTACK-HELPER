@@ -487,6 +487,7 @@
     {"id":{"name":"spr_next","path":"sprites/spr_next/spr_next.yy",},},
     {"id":{"name":"spr_pc","path":"sprites/spr_pc/spr_pc.yy",},},
     {"id":{"name":"spr_play","path":"sprites/spr_play/spr_play.yy",},},
+    {"id":{"name":"spr_reference","path":"sprites/spr_reference/spr_reference.yy",},},
     {"id":{"name":"spr_save","path":"sprites/spr_save/spr_save.yy",},},
     {"id":{"name":"spr_spr_folder","path":"sprites/spr_spr_folder/spr_spr_folder.yy",},},
     {"id":{"name":"spr_text_input","path":"sprites/spr_text_input/spr_text_input.yy",},},

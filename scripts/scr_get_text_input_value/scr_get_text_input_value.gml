@@ -1,5 +1,33 @@
 function scr_get_text_input_value(_id)
 {
+    if (_id == 201)
+    {
+        var type_key = scr_sync_selected_flag_submenu();
+        return scr_get_flag_type_index_from_key(type_key);
+    }
+
+    var flag_input = scr_get_flag_input_definition(_id);
+
+    if (!is_undefined(flag_input))
+    {
+        var selected_flag = scr_get_selected_flag();
+
+        if (is_undefined(selected_flag)) return flag_input.field.default_value;
+
+        scr_try_infer_flag_submenu(selected_flag);
+
+        if (!variable_struct_exists(selected_flag, flag_input.field.property))
+        {
+            variable_struct_set(
+                selected_flag,
+                flag_input.field.property,
+                flag_input.field.default_value
+            );
+        }
+
+        return variable_struct_get(selected_flag, flag_input.field.property);
+    }
+
     switch (_id)
     {
         
@@ -74,24 +102,6 @@ function scr_get_text_input_value(_id)
         // Animation frame properties
         case 100: return scr_get_selected_animation_key_number_value("start", 0);
         case 101: return scr_get_selected_animation_key_number_value("animation_frame", 0);
-		// Flag properties
-		case 200: {
-			var flag = scr_get_selected_flag();
-
-			if (is_undefined(flag))
-			{
-				return "";
-			}
-
-			if (!variable_struct_exists(flag, "code"))
-			{
-				flag.code = "";
-			}
-
-			return flag.code;
-		}
-		case 201: return global.current_flag_add;
-
         // Phase flags/code
         case 300:
         {
@@ -102,6 +112,34 @@ function scr_get_text_input_value(_id)
 
 function scr_update_text_input(_id, _input)
 {
+    if (_id == 201)
+    {
+        scr_set_selected_flag_type(_input);
+        scr_refresh_flag_type_submenu();
+        scr_refresh_text_input_group("flag");
+        return;
+    }
+
+    var flag_input = scr_get_flag_input_definition(_id);
+
+    if (!is_undefined(flag_input))
+    {
+        var selected_flag = scr_get_selected_flag();
+
+        if (!is_undefined(selected_flag))
+        {
+            selected_flag.ui_type = flag_input.type_key;
+            global.flag_type_submenu_open = flag_input.type_key;
+            variable_struct_set(selected_flag, flag_input.field.property, string(_input));
+            scr_rebuild_flag_code(selected_flag);
+
+            mark_attack_json_dirty();
+            scr_save_current_attack_json();
+        }
+
+        return;
+    }
+
     switch (_id)
     {
         
@@ -241,21 +279,6 @@ function scr_update_text_input(_id, _input)
 		case 101:
 			scr_set_selected_animation_key_number_value("animation_frame", _input);
 			break;
-			case 200:
-{
-    var flag = scr_get_selected_flag();
-
-    if (!is_undefined(flag))
-    {
-        flag.type = "code";
-        flag.code = _input;
-
-        mark_attack_json_dirty();
-        scr_save_current_attack_json();
-    }
-
-    break;
-}
         case 300:
         {
             var phase = scr_get_selected_phase();
@@ -276,6 +299,15 @@ function scr_initiate_text_value(_id, _input = "", _array = "")
 {
     numbers_only = false;
     text_input_type = "input";
+
+    var flag_input = scr_get_flag_input_definition(_id);
+
+    if (!is_undefined(flag_input))
+    {
+        text_input_type = flag_input.field.input_type;
+        numbers_only = flag_input.field.numbers_only;
+        return;
+    }
 
     switch (_id)
     {
@@ -319,6 +351,14 @@ function scr_initiate_text_value(_id, _input = "", _array = "")
             break;
         }
 
+        // Flag type dropdown
+        case 201:
+        {
+            text_input_type = "dropdown";
+            numbers_only = false;
+            break;
+        }
+
         // Hit SFX is a sound asset name or another GML expression.
         case 12:
         {
@@ -329,7 +369,6 @@ function scr_initiate_text_value(_id, _input = "", _array = "")
 
         
         // Numeric hitbox inputs
-        case 200:
         case 300:
 		{
 			text_input_type = "codebox";
@@ -366,6 +405,9 @@ function scr_get_text_list(_id)
 
         case 11:
             return scr_get_hit_vfx_list();
+
+        case 201:
+            return scr_get_flag_type_names();
     }
 
     return [];

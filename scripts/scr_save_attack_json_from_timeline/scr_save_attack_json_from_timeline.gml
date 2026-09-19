@@ -63,6 +63,13 @@ function scr_save_attack_json_from_timeline(_timeline, _json_path)
             json_phase.or = timeline_phase.or;
         }
 
+        var phase_attack_stop_state = scr_get_phase_attack_stop_state(timeline_phase);
+
+        if (phase_attack_stop_state != "none")
+        {
+            json_phase.attackStopState = phase_attack_stop_state;
+        }
+
         if (variable_struct_exists(timeline_phase, "flags"))
         {
             for (var pf = 0; pf < array_length(timeline_phase.flags); pf++)

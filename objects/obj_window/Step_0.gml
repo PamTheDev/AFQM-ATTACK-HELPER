@@ -40,7 +40,7 @@ if (point_in_rectangle(mx, my, apply_x1, apply_y1, apply_x1 + apply_w, apply_y1 
     exit;
 }
 
-for (var i = 0; i < array_length(check_functions); i++)
+for (var i = 0; i < array_length(option_labels); i++)
 {
     var column = floor(i / row_count);
     var row = i mod row_count;
@@ -49,7 +49,15 @@ for (var i = 0; i < array_length(check_functions); i++)
 
     if (point_in_rectangle(mx, my, option_x, option_y, option_x + option_w, option_y + option_h - 2))
     {
-        check_states[i] = !check_states[i];
+        if (window_mode == "attack_stop")
+        {
+            selected_state_index = i;
+        }
+        else
+        {
+            check_states[i] = !check_states[i];
+        }
+
         exit;
     }
 }

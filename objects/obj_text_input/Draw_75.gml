@@ -15,6 +15,9 @@ var my = device_mouse_y_to_gui(0);
 var input_w = 32 * image_xscale;
 var input_h = 32 * image_yscale;
 
+if (text_input_type == "dropdown")
+	input_w += 20
+
 // Instances of this object share a draw depth. If another input overlaps an
 // open dropdown, do not draw that covered input over the option list. This is
 // independent of GameMaker's instance draw order and works on the opening frame.
@@ -157,6 +160,29 @@ if (
 
 
 
+// Clicking the dropdown's top field again closes it, matching an outside click.
+
+
+if (
+    clicked &&
+    highlighted &&
+    global.text_input_instance == id &&
+    text_input_type == "dropdown"
+)
+{
+    scr_text_input_finish_property_undo();
+
+    global.text_input_focused = false;
+    global.text_input_id = undefined;
+    global.text_input_instance = noone;
+    keyboard_string = "";
+
+    // Do not let the focus block below immediately reopen the dropdown.
+    clicked = false;
+}
+
+
+
 // Click input to focus/select
 
 
@@ -208,7 +234,9 @@ if (
     if (text_input_type == "dropdown")
     {
         var dbx = x;
-        var dbw = 32 * image_xscale;
+        var dbw = (32 * image_xscale) + 20;
+
+
 
         var dropdown_top = dropdown_y;
         var dropdown_bottom = dropdown_y + dropdown_option_h * array_length(current_list);
@@ -254,15 +282,13 @@ draw_rectangle(
     false
 );
 
-
-
 // Draw dropdown
 
 
 if (text_input_type == "dropdown" && global.text_input_instance == id)
 {
     var bx2 = x;
-    var bw2 = 32 * image_xscale;
+    var bw2 = 32 * image_xscale + 20;
 
     for (var d = 0; d < array_length(current_list); d++)
     {
@@ -295,6 +321,34 @@ if (text_input_type == "dropdown" && global.text_input_instance == id)
 }
 
 
+if (text_input_type == "dropdown")
+{
+	draw_set_colour(c_white);
+	if global.text_input_instance == id
+		{
+			draw_triangle(
+			x + input_w - 20,
+			y + input_h / 2,
+			x + input_w - 5,
+			y + input_h / 2,
+			x + input_w - 12,
+			y + input_h / 3,
+			false
+			);
+		}
+	else
+		{
+			draw_triangle(
+			x+ input_w - 20,
+			y + input_h / 2,
+			x+ input_w - 5,
+			y + input_h / 2,
+			x+ input_w - 12,
+			y + input_h / 1.5,
+			false
+			);
+		}
+}
 
 // Draw codebox text
 if (text_input_type == "codebox")

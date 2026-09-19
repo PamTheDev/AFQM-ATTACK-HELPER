@@ -82,6 +82,15 @@ function scr_undo_last_action()
 
     show_debug_message("Undid attack-connected check changes.");
 }
+	else if (action.type == "phase_attack_stop_state")
+{
+    scr_set_phase_attack_stop_state(action.target, action.before);
+
+    mark_attack_json_dirty();
+    scr_save_current_attack_json();
+
+    show_debug_message("Undid phase end state change.");
+}
 	else if (action.type == "hitbox_property_edit")
 {
     scr_text_input_write_target_value(

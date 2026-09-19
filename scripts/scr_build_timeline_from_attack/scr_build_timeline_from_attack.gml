@@ -250,6 +250,12 @@ function scr_build_timeline_from_attack(_attack)
             }
         }
 
+        var phase_attack_stop_state = "none";
+
+        if (variable_struct_exists(phase, "attackStopState"))
+        {
+            phase_attack_stop_state = string(phase.attackStopState);
+        }
 
         array_push(timeline.phases, {
             name: "Phase " + string(p),
@@ -257,7 +263,8 @@ function scr_build_timeline_from_attack(_attack)
             duration: phase_length,
             phase_index: p,
             lasts: max(0, phase_length - 1),
-            flags: phase_flags
+            flags: phase_flags,
+            attack_stop_state: phase_attack_stop_state
         });
 
         phase_start += phase_length;

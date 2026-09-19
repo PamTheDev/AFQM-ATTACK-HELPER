@@ -41,6 +41,411 @@ function scr_make_code_flag(_code, _scope = "frame", _original_line = "")
         original_line: _original_line
     };
 }
+
+// Flag panel definitions live in one list so adding another flag type only
+// requires a definition here. Function flag code and panel inputs are both
+// generated from this data.
+function scr_get_flag_type_definitions()
+{
+    return [
+        {
+            key: "custom_code",
+            label: "Custom Code",
+            function_name: "",
+            inputs: [
+                { id: 200, label: "Code:", property: "code", default_value: "", input_type: "codebox", numbers_only: false }
+            ]
+        },
+        {
+            key: "game_sound_play",
+            label: "game_sound_play",
+            function_name: "game_sound_play",
+            inputs: [
+                { id: 202, label: "Sound:", property: "sound", default_value: "0", input_type: "input", numbers_only: false }
+            ]
+        },
+        {
+            key: "vfx",
+            label: "vfx",
+            function_name: "vfx_create",
+            inputs: [
+                { id: 210, label: "Sprite:", property: "sprite", default_value: "0", input_type: "input", numbers_only: false },
+                { id: 211, label: "Image Speed:", property: "image_speed", default_value: "1", input_type: "input", numbers_only: false },
+                { id: 212, label: "Start Frame:", property: "start_frame", default_value: "0", input_type: "input", numbers_only: false },
+                { id: 213, label: "Lifetime:", property: "lifetime", default_value: "1", input_type: "input", numbers_only: false },
+                { id: 214, label: "X:", property: "x", default_value: "x", input_type: "input", numbers_only: false },
+                { id: 215, label: "Y:", property: "y", default_value: "y", input_type: "input", numbers_only: false },
+                { id: 216, label: "Scale:", property: "scale", default_value: "1", input_type: "input", numbers_only: false },
+                { id: 217, label: "Angle:", property: "angle", default_value: "0", input_type: "input", numbers_only: false },
+                { id: 218, label: "Layer (optional):", property: "layer", default_value: "", input_type: "input", numbers_only: false, optional: true }
+            ]
+        },
+        {
+            key: "hitbox_reset",
+            label: "hitbox_reset",
+            function_name: "hitbox_group_reset",
+            inputs: [
+                { id: 219, label: "Group:", property: "group", default_value: "0", input_type: "input", numbers_only: false }
+            ]
+        },
+        {
+            key: "speed_set",
+            label: "speed_set",
+            function_name: "speed_set",
+            inputs: [
+                { id: 220, label: "X Speed:", property: "x_speed", default_value: "0", input_type: "input", numbers_only: false },
+                { id: 221, label: "Y Speed:", property: "y_speed", default_value: "0", input_type: "input", numbers_only: false },
+                { id: 222, label: "Relative X (optional):", property: "relative_x", default_value: "false", input_type: "input", numbers_only: false, optional: true },
+                { id: 223, label: "Relative Y (optional):", property: "relative_y", default_value: "false", input_type: "input", numbers_only: false, optional: true }
+            ]
+        },
+        {
+            key: "calculate_smash_damage",
+            label: "calculate_smash_damage",
+            function_name: "calculate_smash_damage",
+            inputs: [
+                { id: 231, label: "Base Damage:", property: "damage", default_value: "0", input_type: "input", numbers_only: false },
+                { id: 232, label: "Charge (optional):", property: "charge", default_value: "", placeholder: "charge", input_type: "input", numbers_only: false, optional: true },
+                { id: 233, label: "Max Charge (optional):", property: "max_charge", default_value: "", placeholder: "smash_attack_charge_max", input_type: "input", numbers_only: false, optional: true },
+                { id: 234, label: "Multiplier (optional):", property: "multiplier", default_value: "", placeholder: "smash_attack_multiplier", input_type: "input", numbers_only: false, optional: true }
+            ]
+        }
+    ];
+}
+
+function scr_get_flag_type_names()
+{
+    var definitions = scr_get_flag_type_definitions();
+    var names = [];
+
+    for (var i = 0; i < array_length(definitions); i++)
+    {
+        array_push(names, definitions[i].label);
+    }
+
+    return names;
+}
+
+function scr_get_flag_type_index_from_key(_key)
+{
+    var definitions = scr_get_flag_type_definitions();
+
+    for (var i = 0; i < array_length(definitions); i++)
+    {
+        if (definitions[i].key == _key) return i;
+    }
+
+    return 0;
+}
+
+function scr_get_flag_type_definition_from_key(_key)
+{
+    var definitions = scr_get_flag_type_definitions();
+    var index = scr_get_flag_type_index_from_key(_key);
+    return definitions[index];
+}
+
+function scr_get_flag_input_definition(_input_id)
+{
+    var definitions = scr_get_flag_type_definitions();
+
+    for (var i = 0; i < array_length(definitions); i++)
+    {
+        var inputs = definitions[i].inputs;
+
+        for (var f = 0; f < array_length(inputs); f++)
+        {
+            if (inputs[f].id == _input_id)
+            {
+                return {
+                    type_key: definitions[i].key,
+                    type_label: definitions[i].label,
+                    function_name: definitions[i].function_name,
+                    field: inputs[f]
+                };
+            }
+        }
+    }
+
+    return undefined;
+}
+
+function scr_split_flag_function_arguments(_arguments)
+{
+    var result = [];
+    var argument_buffer = "";
+    var parenthesis_depth = 0;
+    var quote = "";
+    var previous = "";
+
+    for (var i = 1; i <= string_length(_arguments); i++)
+    {
+        var character = string_char_at(_arguments, i);
+
+        if (quote != "")
+        {
+            argument_buffer += character;
+
+            if (character == quote && previous != "\\") quote = "";
+        }
+        else if (character == "\"" || character == "'")
+        {
+            quote = character;
+            argument_buffer += character;
+        }
+        else if (character == "(")
+        {
+            parenthesis_depth++;
+            argument_buffer += character;
+        }
+        else if (character == ")")
+        {
+            parenthesis_depth--;
+            argument_buffer += character;
+        }
+        else if (character == "," && parenthesis_depth == 0)
+        {
+            array_push(result, string_trim(argument_buffer));
+            argument_buffer = "";
+        }
+        else
+        {
+            argument_buffer += character;
+        }
+
+        previous = character;
+    }
+
+    if (argument_buffer != "" || string_length(_arguments) > 0)
+    {
+        array_push(result, string_trim(argument_buffer));
+    }
+
+    return result;
+}
+
+function scr_try_infer_flag_submenu(_flag)
+{
+    if (is_undefined(_flag)) return "custom_code";
+
+    if (variable_struct_exists(_flag, "ui_type"))
+    {
+        var saved_key = string(_flag.ui_type);
+        var saved_definitions = scr_get_flag_type_definitions();
+
+        for (var saved_index = 0; saved_index < array_length(saved_definitions); saved_index++)
+        {
+            if (saved_definitions[saved_index].key == saved_key) return saved_key;
+        }
+    }
+
+    var code = "";
+    if (variable_struct_exists(_flag, "code")) code = string_trim(string(_flag.code));
+
+    if (string_char_at(code, string_length(code)) == ";")
+    {
+        code = string_trim(string_delete(code, string_length(code), 1));
+    }
+
+    var definitions = scr_get_flag_type_definitions();
+
+    for (var i = 1; i < array_length(definitions); i++)
+    {
+        var definition = definitions[i];
+        var prefix = definition.function_name + "(";
+
+        if (
+            string_copy(code, 1, string_length(prefix)) == prefix &&
+            string_char_at(code, string_length(code)) == ")"
+        )
+        {
+            var argument_text = string_copy(
+                code,
+                string_length(prefix) + 1,
+                string_length(code) - string_length(prefix) - 1
+            );
+            var arguments = scr_split_flag_function_arguments(argument_text);
+
+            var required_argument_count = 0;
+
+            for (var required_index = 0; required_index < array_length(definition.inputs); required_index++)
+            {
+                var required_field = definition.inputs[required_index];
+                var field_is_optional =
+                    variable_struct_exists(required_field, "optional") &&
+                    required_field.optional;
+
+                if (!field_is_optional) required_argument_count++;
+            }
+
+            if (
+                array_length(arguments) >= required_argument_count &&
+                array_length(arguments) <= array_length(definition.inputs)
+            )
+            {
+                for (var a = 0; a < array_length(definition.inputs); a++)
+                {
+                    var argument_value = definition.inputs[a].default_value;
+                    if (a < array_length(arguments)) argument_value = arguments[a];
+
+                    variable_struct_set(_flag, definition.inputs[a].property, argument_value);
+                }
+
+                _flag.ui_type = definition.key;
+                return definition.key;
+            }
+        }
+    }
+
+    _flag.ui_type = "custom_code";
+    return "custom_code";
+}
+
+function scr_sync_selected_flag_submenu()
+{
+    if (!variable_global_exists("flag_type_submenu_open"))
+    {
+        global.flag_type_submenu_open = "custom_code";
+    }
+
+    var flag = scr_get_selected_flag();
+
+    if (!is_undefined(flag))
+    {
+        global.flag_type_submenu_open = scr_try_infer_flag_submenu(flag);
+    }
+
+    return global.flag_type_submenu_open;
+}
+
+function scr_rebuild_flag_code(_flag)
+{
+    if (is_undefined(_flag)) return false;
+
+    var type_key = scr_try_infer_flag_submenu(_flag);
+    var definition = scr_get_flag_type_definition_from_key(type_key);
+
+    _flag.type = "code";
+    _flag.scope = "frame";
+
+    if (type_key != "custom_code")
+    {
+        var code = definition.function_name + "(";
+        var generated_argument_count = array_length(definition.inputs);
+
+        // Optional blank inputs are omitted from the end of the function call.
+        while (generated_argument_count > 0)
+        {
+            var trailing_field = definition.inputs[generated_argument_count - 1];
+            var trailing_is_optional =
+                variable_struct_exists(trailing_field, "optional") &&
+                trailing_field.optional;
+
+            if (!trailing_is_optional) break;
+
+            if (!variable_struct_exists(_flag, trailing_field.property))
+            {
+                variable_struct_set(_flag, trailing_field.property, trailing_field.default_value);
+            }
+
+            if (string(variable_struct_get(_flag, trailing_field.property)) != "") break;
+            generated_argument_count--;
+        }
+
+        for (var i = 0; i < generated_argument_count; i++)
+        {
+            var field = definition.inputs[i];
+
+            if (!variable_struct_exists(_flag, field.property))
+            {
+                variable_struct_set(_flag, field.property, field.default_value);
+            }
+
+            if (i > 0) code += ", ";
+
+            var field_value = string(variable_struct_get(_flag, field.property));
+
+            // Optional arguments before another supplied argument still need an
+            // explicit engine-default expression to keep the call valid.
+            if (
+                field_value == "" &&
+                variable_struct_exists(field, "placeholder")
+            )
+            {
+                field_value = field.placeholder;
+            }
+
+            code += field_value;
+        }
+
+        code += ");";
+        _flag.code = code;
+    }
+    else if (!variable_struct_exists(_flag, "code"))
+    {
+        _flag.code = "";
+    }
+
+    if (type_key == "custom_code")
+    {
+        _flag.custom_code = _flag.code;
+    }
+
+    _flag.original_line = _flag.code;
+    return true;
+}
+
+function scr_apply_flag_type(_flag, _type_key)
+{
+    if (is_undefined(_flag)) return false;
+
+    var old_type_key = scr_try_infer_flag_submenu(_flag);
+
+    if (old_type_key == "custom_code" && variable_struct_exists(_flag, "code"))
+    {
+        _flag.custom_code = _flag.code;
+    }
+
+    var definition = scr_get_flag_type_definition_from_key(_type_key);
+    _flag.ui_type = definition.key;
+
+    if (
+        definition.key == "custom_code" &&
+        variable_struct_exists(_flag, "custom_code")
+    )
+    {
+        _flag.code = _flag.custom_code;
+    }
+
+    for (var i = 0; i < array_length(definition.inputs); i++)
+    {
+        var field = definition.inputs[i];
+
+        if (!variable_struct_exists(_flag, field.property))
+        {
+            variable_struct_set(_flag, field.property, field.default_value);
+        }
+    }
+
+    scr_rebuild_flag_code(_flag);
+    return true;
+}
+
+function scr_set_selected_flag_type(_index)
+{
+    var definitions = scr_get_flag_type_definitions();
+    var index = clamp(floor(real(_index)), 0, array_length(definitions) - 1);
+    var definition = definitions[index];
+    var flag = scr_get_selected_flag();
+
+    global.flag_type_submenu_open = definition.key;
+
+    if (!scr_apply_flag_type(flag, definition.key)) return false;
+
+    mark_attack_json_dirty();
+    scr_save_current_attack_json();
+    return true;
+}
 function scr_add_flag_at_playhead(_timeline, _code = "")
 {
     if (is_undefined(_timeline))

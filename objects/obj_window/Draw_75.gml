@@ -17,7 +17,14 @@ draw_rectangle(window_x, window_y, window_x + window_w, window_y + header_h - 8,
 
 draw_set_color(c_white);
 draw_rectangle(window_x, window_y, window_x + window_w, window_y + window_h, true);
-draw_text_transformed(window_x + 20, window_y + 14, "Attack Connected Checks", 1.5, 1.5, 0);
+draw_text_transformed(
+    window_x + 20,
+    window_y + 14,
+    window_mode == "attack_stop" ? "Phase End State" : "Attack Connected Checks",
+    1.5,
+    1.5,
+    0
+);
 
 var phase_label = "Phase " + string(target_phase_index);
 
@@ -27,7 +34,13 @@ if (is_struct(target_phase) && variable_struct_exists(target_phase, "name"))
 }
 
 draw_set_color(c_ltgray);
-draw_text(window_x + 22, window_y + 46, phase_label + " - toggle checks that stop the attack after connecting");
+draw_text(
+    window_x + 22,
+    window_y + 46,
+    window_mode == "attack_stop"
+        ? phase_label + " - choose the state entered when this phase ends"
+        : phase_label + " - toggle checks that stop the attack after connecting"
+);
 
 var close_x1 = window_x + window_w - 48;
 var close_y1 = window_y + 16;
@@ -38,7 +51,7 @@ draw_rectangle(close_x1, close_y1, close_x1 + 32, close_y1 + 32, false);
 draw_set_color(c_white);
 draw_text(close_x1 + 11, close_y1 + 7, "X");
 
-for (var i = 0; i < array_length(check_functions); i++)
+for (var i = 0; i < array_length(option_labels); i++)
 {
     var column = floor(i / row_count);
     var row = i mod row_count;
@@ -49,7 +62,11 @@ for (var i = 0; i < array_length(check_functions); i++)
     draw_set_color(hovered ? make_color_rgb(62, 62, 70) : make_color_rgb(42, 42, 48));
     draw_rectangle(option_x, option_y, option_x + option_w, option_y + option_h - 2, false);
 
-    draw_set_color(check_states[i] ? make_color_rgb(65, 175, 95) : make_color_rgb(75, 75, 82));
+    var option_selected = window_mode == "attack_stop"
+        ? selected_state_index == i
+        : check_states[i];
+
+    draw_set_color(option_selected ? make_color_rgb(65, 175, 95) : make_color_rgb(75, 75, 82));
     draw_rectangle(
         option_x + 7,
         option_y + 6,
@@ -60,12 +77,12 @@ for (var i = 0; i < array_length(check_functions); i++)
 
     draw_set_color(c_white);
 
-    if (check_states[i])
+    if (option_selected)
     {
         draw_text(option_x + 12, option_y + 6, "x");
     }
 
-    draw_text(option_x + 34, option_y + 8, check_functions[i]);
+    draw_text(option_x + 34, option_y + 8, option_labels[i]);
 }
 
 var apply_w = 180;

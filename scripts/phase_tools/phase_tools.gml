@@ -22,7 +22,8 @@ function scr_timeline_ensure_phases(_timeline)
             duration: len,
             phase_index: 0,
             lasts: max(0, len - 1),
-            flags: []
+            flags: [],
+            attack_stop_state: "none"
         });
     }
 }
@@ -219,7 +220,8 @@ function scr_timeline_add_phase_after(_timeline, _phase_index, _duration)
         duration: _duration,
         phase_index: insert_index,
         lasts: max(0, _duration - 1),
-        flags: []
+        flags: [],
+        attack_stop_state: "none"
     };
 
     array_insert(_timeline.phases, insert_index, new_phase);
@@ -478,6 +480,104 @@ function scr_get_attack_connected_check_functions()
         "cancel_air_check",
         "cancel_jump_check"
     ];
+}
+
+
+function scr_get_phase_attack_stop_states()
+{
+    return [
+        "none",
+        "idle",
+        "crouching",
+        "walking",
+        "walk_turnaround",
+        "dashing",
+        "running",
+        "run_turnaround",
+        "run_stop",
+        "jumpsquat",
+        "aerial",
+        "airdodging",
+        "wavelanding",
+        "rolling",
+        "shielding",
+        "shield_release",
+        "shield_break",
+        "parry_press",
+        "parry_stun",
+        "spot_dodging",
+        "hitlag",
+        "hitstun",
+        "tumble",
+        "helpless",
+        "magnetized",
+        "flinch",
+        "balloon",
+        "landing_lag",
+        "knockdown",
+        "getup",
+        "tech_rolling",
+        "teching",
+        "tech_wall_jump",
+        "ledge_snap",
+        "ledge_hang",
+        "ledge_getup",
+        "ledge_jump",
+        "ledge_roll",
+        "ledge_attack",
+        "ledge_tether",
+        "ledge_trump",
+        "wall_cling",
+        "wall_jump",
+        "knocked_out",
+        "star_ko",
+        "screen_ko",
+        "respawning",
+        "attacking",
+        "grabbing",
+        "grabbed",
+        "grab_release",
+        "lost",
+        "entrance"
+    ];
+}
+
+
+function scr_get_phase_attack_stop_state(_phase)
+{
+    if (is_undefined(_phase)) return "none";
+    if (!variable_struct_exists(_phase, "attack_stop_state")) return "none";
+
+    var phase_end_state = string(_phase.attack_stop_state);
+    var valid_states = scr_get_phase_attack_stop_states();
+
+    for (var i = 0; i < array_length(valid_states); i++)
+    {
+        if (valid_states[i] == phase_end_state) return phase_end_state;
+    }
+
+    return "none";
+}
+
+
+function scr_set_phase_attack_stop_state(_phase, _phase_end_state)
+{
+    if (is_undefined(_phase)) return false;
+
+    var valid_states = scr_get_phase_attack_stop_states();
+    var normalized_state = "none";
+
+    for (var i = 0; i < array_length(valid_states); i++)
+    {
+        if (valid_states[i] == string(_phase_end_state))
+        {
+            normalized_state = valid_states[i];
+            break;
+        }
+    }
+
+    _phase.attack_stop_state = normalized_state;
+    return true;
 }
 
 

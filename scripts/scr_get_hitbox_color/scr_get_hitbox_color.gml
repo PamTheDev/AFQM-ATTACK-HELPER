@@ -26,3 +26,29 @@ function scr_get_hitbox_color(_hb){
 			return c_fuchsia
 	}
 }
+
+function scr_get_flag_color(_flag)
+{
+    if (is_undefined(_flag) || !is_struct(_flag))
+    {
+        return c_dkgray;
+    }
+
+    // Also identifies flags loaded from existing code.
+    var flag_type = scr_try_infer_flag_submenu(_flag);
+
+    switch (flag_type) {
+		default:
+            return c_dkgray;
+		case "custom_code":
+			return c_lime
+		case "game_sound_play":
+			return c_orange
+		case "speed_set":
+			return c_aqua
+		case "vfx":
+			return c_fuchsia
+		case "hitbox_reset":
+			return c_red
+	}
+}

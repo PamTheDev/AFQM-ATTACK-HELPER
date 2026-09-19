@@ -20,6 +20,38 @@ function scr_clear_text_input_focus()
     keyboard_string = "";
 }
 
+function scr_flag_panel_input_should_show(_input_id, _flag_type_key)
+{
+    if (_input_id == 201) return true;
+
+    if (!variable_global_exists("flag_type_submenu_open"))
+    {
+        global.flag_type_submenu_open = "custom_code";
+    }
+
+    return _flag_type_key == global.flag_type_submenu_open;
+}
+
+function scr_refresh_flag_type_submenu()
+{
+    scr_sync_selected_flag_submenu();
+
+    with (obj_text_input)
+    {
+        if (input_group == "flag")
+        {
+            var should_show =
+                global.menu_focus == "flag" &&
+                scr_flag_panel_input_should_show(attatched_id, flag_type_key);
+
+            input_enabled = should_show;
+            visible = should_show;
+
+            if (!should_show) highlighted = false;
+        }
+    }
+}
+
 
 function scr_show_only_text_input_group(_group)
 {
@@ -28,12 +60,19 @@ function scr_show_only_text_input_group(_group)
         global.menu_focus = "default";
     }
 
+    if (_group == "flag") scr_sync_selected_flag_submenu();
+
     // If this group is already active, do NOT clear focus.
     if (global.menu_focus == _group)
     {
         with (obj_text_input)
         {
             var should_show = input_group == _group;
+
+            if (should_show && _group == "flag")
+            {
+                should_show = scr_flag_panel_input_should_show(attatched_id, flag_type_key);
+            }
 
             input_enabled = should_show;
             visible = should_show;
@@ -55,6 +94,11 @@ function scr_show_only_text_input_group(_group)
     with (obj_text_input)
     {
         var should_show = input_group == _group;
+
+        if (should_show && _group == "flag")
+        {
+            should_show = scr_flag_panel_input_should_show(attatched_id, flag_type_key);
+        }
 
         input_enabled = should_show;
         visible = should_show;

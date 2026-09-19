@@ -43,7 +43,7 @@ input_labels = {
 // Helper for creating a text input
 
 
-function create_panel_input(_input_id, _x, _y, _xscale, _group)
+function create_panel_input(_input_id, _x, _y, _xscale, _group, _flag_type_key = "")
 {
     var inst = instance_create_layer(_x, _y, "Instances", obj_text_input);
 
@@ -51,6 +51,7 @@ function create_panel_input(_input_id, _x, _y, _xscale, _group)
     {
         image_xscale = _xscale;
         image_yscale = 1;
+        flag_type_key = _flag_type_key;
 
         scr_setup_text_input(_input_id, _group);
     }
@@ -58,7 +59,7 @@ function create_panel_input(_input_id, _x, _y, _xscale, _group)
     return inst;
 }
 
-function create_code_box_input(_input_id, _x, _y, _xscale, _yscale, _group)
+function create_code_box_input(_input_id, _x, _y, _xscale, _yscale, _group, _flag_type_key = "")
 {
     var inst = instance_create_layer(_x, _y, "Instances", obj_text_input);
 
@@ -66,6 +67,7 @@ function create_code_box_input(_input_id, _x, _y, _xscale, _yscale, _group)
     {
         image_xscale = _xscale;
         image_yscale = _yscale;
+        flag_type_key = _flag_type_key;
 
         scr_setup_text_input(_input_id, string(_group));
     }
@@ -141,16 +143,58 @@ create_panel_input(
 	"frame"
 );
 
-text_y = panel_y + 97;
+// Flag type selector. global.flag_type_submenu_open controls which definition's
+// inputs are visible while this dropdown remains available for every flag type.
+if (!variable_global_exists("flag_type_submenu_open"))
+{
+    global.flag_type_submenu_open = "custom_code";
+}
 
-create_code_box_input(
-    200,
-    panel_x + 30,
-    panel_y + 420,
-    9.25,
-    5,
+create_panel_input(
+    201,
+    panel_x + 115,
+    panel_y + 97,
+    6.5,
     "flag"
 );
+
+// Create every flag submenu from the central definition list. Regular inputs
+// flow down the panel automatically; code boxes keep the existing large editor.
+var flag_definitions = scr_get_flag_type_definitions();
+
+for (var flag_type_index = 0; flag_type_index < array_length(flag_definitions); flag_type_index++)
+{
+    var flag_definition = flag_definitions[flag_type_index];
+
+    for (var flag_input_index = 0; flag_input_index < array_length(flag_definition.inputs); flag_input_index++)
+    {
+        var flag_input = flag_definition.inputs[flag_input_index];
+
+        if (flag_input.input_type == "codebox")
+        {
+            create_code_box_input(
+                flag_input.id,
+                panel_x + 30,
+                panel_y + 420,
+                9.25,
+                5,
+                "flag",
+                flag_definition.key
+            );
+        }
+        else
+        {
+            create_panel_input(
+                flag_input.id,
+                panel_x + 180,
+                panel_y + 155 + flag_input_index * 40,
+                5.5,
+                "flag",
+                flag_definition.key
+            );
+        }
+    }
+}
 
 // Phase code uses the same temporary code-box editor as frame flags.
 create_code_box_input(
@@ -161,12 +205,4 @@ create_code_box_input(
     5,
     "phase"
 );
-/*
-create_panel_input(
-    201,
-    panel_x + 30,
-    text_y,
-    8,
-	"flag"
-);*/
 scr_hide_all_text_input_groups()
