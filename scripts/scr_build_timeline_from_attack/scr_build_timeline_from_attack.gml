@@ -15,17 +15,6 @@ function scr_build_timeline_from_attack(_attack)
     array_push(timeline.tracks, animation_track);
 
 
-    // Flag track
-
-    var flag_track = {
-        name: "Flags",
-        type: "flag",
-        keys: []
-    };
-
-    array_push(timeline.tracks, flag_track);
-
-
     // Hitbox tracks
 
     var hitbox_tracks = [];
@@ -235,7 +224,15 @@ function scr_build_timeline_from_attack(_attack)
                             flag.scope = "frame";
                         }
 
-                        array_push(flag_track.keys, {
+                        // Reuse a flag track when this frame is free. If every
+                        // flag track is occupied here, create the next track.
+                        var flag_track_index = scr_get_or_create_available_flag_track(
+                            timeline,
+                            absolute_frame,
+                            1
+                        );
+
+                        array_push(timeline.tracks[flag_track_index].keys, {
                             start: absolute_frame,
                             duration: 1,
 

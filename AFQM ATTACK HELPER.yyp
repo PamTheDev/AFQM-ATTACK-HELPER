@@ -401,6 +401,7 @@
     {"id":{"name":"obj_prev_frame","path":"objects/obj_prev_frame/obj_prev_frame.yy",},},
     {"id":{"name":"obj_preview_canvas","path":"objects/obj_preview_canvas/obj_preview_canvas.yy",},},
     {"id":{"name":"obj_save","path":"objects/obj_save/obj_save.yy",},},
+    {"id":{"name":"obj_sound_test","path":"objects/obj_sound_test/obj_sound_test.yy",},},
     {"id":{"name":"obj_sprite_folder_button","path":"objects/obj_sprite_folder_button/obj_sprite_folder_button.yy",},},
     {"id":{"name":"obj_text_input","path":"objects/obj_text_input/obj_text_input.yy",},},
     {"id":{"name":"obj_timeline","path":"objects/obj_timeline/obj_timeline.yy",},},

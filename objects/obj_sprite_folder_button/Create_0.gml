@@ -5,6 +5,7 @@ sprite_folder_index = -1;
 sprite_folder_name = "";
 sprite_folder_path = "";
 related_gml_path = "";
+attack_name = "";
 
 hovered = false;
 

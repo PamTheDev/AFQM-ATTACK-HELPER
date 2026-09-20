@@ -32,13 +32,9 @@ gif_conversion_started = false;
 gif_wait_frames = 0;
 gif_wait_max = room_speed * 120;
 
-// Folder scanning
-found = "";
+// Attack GML scanning
+attack_gml_files = [];
 file_search_active = false;
-found_sprite_folders = [];
-scan_per_step = 40;
-
-// GML matching
 valid_index = 0;
 gml_checks_per_step = 1;
 

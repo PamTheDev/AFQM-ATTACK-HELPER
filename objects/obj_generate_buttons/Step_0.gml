@@ -158,6 +158,11 @@ else if (loader_state == "create_buttons")
         
         btn.related_gml_path = global.sprite_folders[create_index].gml_path;
 
+        if (variable_struct_exists(global.sprite_folders[create_index], "attack_name"))
+        {
+            btn.attack_name = global.sprite_folders[create_index].attack_name;
+        }
+
         create_index += 1;
 
         if (create_index >= total_buttons)

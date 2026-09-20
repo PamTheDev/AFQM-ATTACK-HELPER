@@ -13,24 +13,85 @@ function scr_get_flag_track_index(_timeline)
 
     return -1;
 }
-function scr_get_or_create_flag_track(_timeline)
+function scr_get_or_create_flag_track(_timeline, _start = 0, _duration = 1)
 {
-    var track_index = scr_get_flag_track_index(_timeline);
-
-    if (track_index != -1)
+    return scr_get_or_create_available_flag_track(_timeline, _start, _duration);
+}
+function scr_timeline_flag_track_has_overlap(_track, _start, _duration)
+{
+    for (var k = 0; k < array_length(_track.keys); k++)
     {
-        return track_index;
+        var key = _track.keys[k];
+
+        if (scr_timeline_ranges_overlap(_start, _duration, key.start, key.duration))
+        {
+            return true;
+        }
     }
 
+    return false;
+}
+function scr_get_or_create_available_flag_track(_timeline, _start, _duration = 1)
+{
+    if (is_undefined(_timeline)) return -1;
+    if (!variable_struct_exists(_timeline, "tracks")) return -1;
+
+    // Reuse the first flag track that is free for this time range.
+    for (var t = 0; t < array_length(_timeline.tracks); t++)
+    {
+        var track = _timeline.tracks[t];
+
+        if (track.type != "flag")
+        {
+            continue;
+        }
+
+        if (!scr_timeline_flag_track_has_overlap(track, _start, _duration))
+        {
+            return t;
+        }
+    }
+
+    // There are no flag tracks, or every existing flag track overlaps.
+    return scr_create_flag_track(_timeline);
+}
+function scr_create_flag_track(_timeline)
+{
+    if (is_undefined(_timeline)) return -1;
+    if (!variable_struct_exists(_timeline, "tracks")) return -1;
+
+    var flag_track_count = scr_renumber_flag_tracks(_timeline);
+
     var new_track = {
-        name: "Flags",
+        name: "Flag " + string(flag_track_count + 1),
         type: "flag",
         keys: []
     };
 
+    // Append so existing track indices stored by selection and undo remain valid.
     array_push(_timeline.tracks, new_track);
 
     return array_length(_timeline.tracks) - 1;
+}
+function scr_renumber_flag_tracks(_timeline)
+{
+    if (is_undefined(_timeline)) return 0;
+    if (!variable_struct_exists(_timeline, "tracks")) return 0;
+
+    var flag_track_count = 0;
+
+    for (var t = 0; t < array_length(_timeline.tracks); t++)
+    {
+        var track = _timeline.tracks[t];
+
+        if (track.type == "flag")
+        {
+            flag_track_count += 1;
+            track.name = "Flag " + string(flag_track_count);
+        }
+    }
+
+    return flag_track_count;
 }
 function scr_make_code_flag(_code, _scope = "frame", _original_line = "")
 {
@@ -463,27 +524,15 @@ function scr_add_flag_at_playhead(_timeline, _code = "")
 
     var key_start = max(0, round(global.current_timeline_frame));
 
-    // If a flag already exists on this frame, select it instead
+    // Reuse the first free flag track. Create a new one only when every
+    // existing flag track already contains a flag at this frame.
+    var track_index = scr_get_or_create_available_flag_track(_timeline, key_start, 1);
 
-    var existing = scr_find_flag_key_at_frame(_timeline, key_start);
-
-    if (!is_undefined(existing))
+    if (track_index < 0)
     {
-        scr_clear_hitbox_selection();
-        scr_clear_animation_selection();
-
-        scr_select_flag_key(_timeline, existing.track_index, existing.key_index);
-        scr_show_only_text_input_group("flag");
-        scr_refresh_text_input_group("flag");
-
-        show_debug_message("Flag already exists at frame " + string(key_start) + ". Selected existing flag.");
-
-        return existing.key;
+        show_debug_message("Cannot add flag: could not create a flag track.");
+        return undefined;
     }
-
-    // Create new flag
-
-    var track_index = scr_get_or_create_flag_track(_timeline);
 
     var new_flag = {
         type: "code",
@@ -516,6 +565,7 @@ function scr_add_flag_at_playhead(_timeline, _code = "")
     scr_save_current_attack_json();
 
     show_debug_message("Added code flag at frame " + string(key_start));
+    show_debug_message("Flag track: " + string(track_index));
 
     return new_key;
 }
@@ -695,6 +745,20 @@ function scr_cull_redundant_flags(_timeline)
             }
         }
     }
+
+    // A redundant imported flag may have been the only key on its track.
+    // Remove those empty tracks so conversion does not leave blank flag rows.
+    for (var empty_track_index = array_length(_timeline.tracks) - 1; empty_track_index >= 0; empty_track_index--)
+    {
+        var empty_track = _timeline.tracks[empty_track_index];
+
+        if (empty_track.type == "flag" && array_length(empty_track.keys) == 0)
+        {
+            array_delete(_timeline.tracks, empty_track_index, 1);
+        }
+    }
+
+    scr_renumber_flag_tracks(_timeline);
 
     scr_sort_all_timeline_tracks(_timeline);
 

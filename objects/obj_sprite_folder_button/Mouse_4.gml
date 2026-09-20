@@ -5,6 +5,7 @@ show_debug_message(sprite_folder_path);
 global.selected_sprite_folder_name = sprite_folder_name;
 global.selected_sprite_folder_path = sprite_folder_path;
 global.selected_attack_gml_path  = related_gml_path;
+global.selected_attack_name = attack_name;
 
 show_debug_message("Related GML path:");
 show_debug_message(related_gml_path);

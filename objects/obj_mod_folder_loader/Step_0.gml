@@ -54,7 +54,7 @@ if (loader_state == "find_sprite_root")
     }
     else
     {
-        loader_state = "start_folder_scan";
+        loader_state = "start_attack_scan";
     }
 
     exit;
@@ -71,14 +71,14 @@ if (loader_state == "convert_gifs")
 
     if (gif_total <= 0)
     {
-        loader_state = "start_folder_scan";
+        loader_state = "start_attack_scan";
         exit;
     }
 
     if (gif_index >= gif_total)
     {
         show_debug_message("All GIF conversions finished.");
-        loader_state = "start_folder_scan";
+        loader_state = "start_attack_scan";
         exit;
     }
 
@@ -165,146 +165,85 @@ if (loader_state == "convert_gifs")
 
 
 
-// START FOLDER SCAN
+// START ATTACK GML SCAN
 
 
-if (loader_state == "start_folder_scan")
+if (loader_state == "start_attack_scan")
 {
-    load_text = "Starting sprite folder scan...";
+    load_text = "Finding attack scripts...";
     load_progress = 0.35;
 
-    search_mask = sprite_root + "spr_*";
+    attack_gml_files = scr_collect_attack_gmls(mod_root);
+    valid_index = 0;
 
-    show_debug_message("Sprite search mask:");
-    show_debug_message(search_mask);
+    show_debug_message("GlobalScript GML files found:");
+    show_debug_message(string(array_length(attack_gml_files)));
 
-    found_sprite_folders = [];
-
-    found = file_find_first(search_mask, fa_directory);
-    file_search_active = true;
-
-    loader_state = "collect_folders";
+    loader_state = "check_attack_gml";
 
     exit;
 }
 
 
 
-// COLLECT SPRITE FOLDERS
+// VALIDATE ATTACK GML AND MATCH SPRITE FOLDERS
 
 
-if (loader_state == "collect_folders")
+if (loader_state == "check_attack_gml")
 {
-    load_text = "Scanning sprite folders... " + string(array_length(found_sprite_folders)) + " found";
-    load_progress = 0.35;
-
-    var processed = 0;
-
-    while (processed < scan_per_step)
-    {
-        if (found == "")
-        {
-            if (file_search_active)
-            {
-                file_find_close();
-                file_search_active = false;
-            }
-
-            show_debug_message("Total sprite folders queued:");
-            show_debug_message(string(array_length(found_sprite_folders)));
-
-            if (array_length(found_sprite_folders) <= 0)
-            {
-                load_error = "No sprite folders found. GIFs may not have converted correctly.";
-                loader_state = "error";
-                exit;
-            }
-
-            valid_index = 0;
-            loader_state = "check_related_gml";
-            exit;
-        }
-
-        var folder_path = string_replace_all(found, "\\", "/");
-
-        // Some GameMaker versions return only the folder name.
-        if (string_pos("/", folder_path) == 0)
-        {
-            folder_path = sprite_root + folder_path;
-        }
-
-        folder_path = scr_normalize_folder_path(folder_path);
-
-        if (directory_exists(folder_path))
-        {
-            var folder_name = scr_get_path_folder_name(folder_path);
-
-            if (scr_starts_with(folder_name, "spr_"))
-            {
-                array_push(found_sprite_folders, {
-                    name: folder_name,
-                    path: folder_path
-                });
-
-                show_debug_message("Queued sprite folder:");
-                show_debug_message(folder_name);
-            }
-        }
-
-        found = file_find_next();
-        processed += 1;
-    }
-
-    exit;
-}
-
-
-
-// CHECK RELATED GML FILES
-
-
-if (loader_state == "check_related_gml")
-{
-    var total_found = array_length(found_sprite_folders);
+    var total_found = array_length(attack_gml_files);
 
     if (total_found <= 0)
     {
-        load_error = "No sprite folders found.";
+        load_error = "No GlobalScript GML files were found.";
         loader_state = "error";
         exit;
     }
 
-    load_text = "Checking related GML... " + string(valid_index + 1) + " / " + string(total_found);
+    load_text = "Checking attack scripts... " + string(valid_index + 1) + " / " + string(total_found);
     load_progress = 0.45 + 0.35 * (valid_index / total_found);
 
     var amount = min(gml_checks_per_step, total_found - valid_index);
 
     repeat (amount)
     {
-        var folder_name = found_sprite_folders[valid_index].name;
-        var folder_path = found_sprite_folders[valid_index].path;
+        var related_gml_path = attack_gml_files[valid_index];
 
-        var related_gml_path = scr_find_related_attack_gml(mod_root, folder_name);
-
-        if (related_gml_path != "")
+        if (scr_is_attack_gml(related_gml_path))
         {
-            array_push(global.sprite_folders, {
-                name: folder_name,
-                path: folder_path,
-                gml_path: related_gml_path
-            });
+            var attack_name = scr_get_attack_key_from_gml_path(related_gml_path);
+            var folder_name = "spr_" + attack_name;
+            var folder_path = scr_normalize_folder_path(sprite_root + folder_name);
 
-            global.sprite_folder_count += 1;
+            if (attack_name != "")
+            {
+                array_push(global.sprite_folders, {
+                    name: folder_name,
+                    path: folder_path,
+                    gml_path: related_gml_path,
+                    attack_name: attack_name
+                });
 
-            show_debug_message("Valid sprite folder:");
-            show_debug_message(folder_name);
-            show_debug_message("Related GML:");
-            show_debug_message(related_gml_path);
+                global.sprite_folder_count += 1;
+
+                show_debug_message("Valid attack:");
+                show_debug_message(attack_name);
+                show_debug_message("Sprite folder:");
+                show_debug_message(folder_path);
+                show_debug_message("GML:");
+                show_debug_message(related_gml_path);
+
+                if (!directory_exists(folder_path))
+                {
+                    show_debug_message("Sprite folder is missing; attack button will still be created:");
+                    show_debug_message(folder_path);
+                }
+            }
         }
         else
         {
-            show_debug_message("Skipping sprite folder because no related GML was found:");
-            show_debug_message(folder_name);
+            show_debug_message("Skipping non-attack GML:");
+            show_debug_message(related_gml_path);
         }
 
         valid_index += 1;
@@ -316,32 +255,27 @@ if (loader_state == "check_related_gml")
     }
 
     if (valid_index >= total_found)
-{
-    show_debug_message("Valid sprite folders found:");
-    show_debug_message(string(global.sprite_folder_count));
-
-    if (global.sprite_folder_count <= 0)
     {
-        load_error = "No sprite folders with related GML files were found.";
-        loader_state = "error";
-        exit;
+        show_debug_message("Valid attacks found:");
+        show_debug_message(string(global.sprite_folder_count));
+
+        if (global.sprite_folder_count <= 0)
+        {
+            load_error = "No valid attack scripts were found.";
+            loader_state = "error";
+            exit;
+        }
+
+        // Save quick-load cache after a successful full scan.
+        scr_save_last_mod_cache(
+            mod_root,
+            sprite_root,
+            global.sprite_folders
+        );
+
+        create_index = 0;
+        loader_state = "create_buttons";
     }
-
-    // Save quick-load cache after a successful full scan.
-    scr_save_last_mod_cache(
-        mod_root,
-        sprite_root,
-        global.sprite_folders
-    );
-scr_save_last_mod_cache(
-    mod_root,
-    sprite_root,
-    global.sprite_folders
-);
-
-create_index = 0;
-loader_state = "create_buttons";
-}
 
     exit;
 }
@@ -357,7 +291,7 @@ if (loader_state == "create_buttons")
 
     if (total_buttons <= 0)
     {
-        load_error = "No valid sprite folders found.";
+        load_error = "No valid attack scripts found.";
         loader_state = "error";
         exit;
     }
@@ -384,6 +318,11 @@ if (loader_state == "create_buttons")
         btn.sprite_folder_name = global.sprite_folders[create_index].name;
         btn.sprite_folder_path = global.sprite_folders[create_index].path;
         btn.related_gml_path = global.sprite_folders[create_index].gml_path;
+
+        if (variable_struct_exists(global.sprite_folders[create_index], "attack_name"))
+        {
+            btn.attack_name = global.sprite_folders[create_index].attack_name;
+        }
 
         create_index += 1;
 

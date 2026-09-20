@@ -4,7 +4,7 @@ function scr_save_last_mod_cache(_mod_root, _sprite_root, _sprite_folders)
     _sprite_root = scr_normalize_folder_path(_sprite_root);
 
     var cache = {
-        version: 1,
+        version: 2,
         mod_root: _mod_root,
         sprite_root: _sprite_root,
         folders: []
@@ -25,10 +25,22 @@ function scr_save_last_mod_cache(_mod_root, _sprite_root, _sprite_folders)
             gml_path = folder_data.related_gml_path;
         }
 
+        var attack_name = "";
+
+        if (variable_struct_exists(folder_data, "attack_name"))
+        {
+            attack_name = folder_data.attack_name;
+        }
+        else if (scr_starts_with(folder_data.name, "spr_"))
+        {
+            attack_name = string_copy(folder_data.name, 5, string_length(folder_data.name) - 4);
+        }
+
         array_push(cache.folders, {
             name: folder_data.name,
             path: scr_normalize_folder_path(folder_data.path),
-            gml_path: string_replace_all(gml_path, "\\", "/")
+            gml_path: string_replace_all(gml_path, "\\", "/"),
+            attack_name: attack_name
         });
     }
 
