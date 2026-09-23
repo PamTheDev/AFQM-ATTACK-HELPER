@@ -101,7 +101,7 @@ open_delay = 1;
 closing = false;
 
 close_and_apply = function()
-{
+{ 
     if (closing) return;
     closing = true;
 
