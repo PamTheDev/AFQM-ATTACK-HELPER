@@ -250,7 +250,10 @@ else if (track.type == "animation")
 }
 else if (track.type == "flag")
 {
-    draw_set_color(make_color_rgb(60, 242, 78));
+	if (variable_struct_exists(key, "flag"))
+    {
+        draw_set_color(merge_colour(scr_get_flag_color(key.flag), c_ltgray, 0.325));
+    }
 }
 else if (track.type == "hitbox")
 {
@@ -272,7 +275,7 @@ else
 
         if (_frame_num mod 2 == 0)
         {
-            draw_set_color(merge_colour(original_color, c_black, 0.4));
+            draw_set_color(merge_colour(original_color, c_black, 0.2));
         }
 
         if (track.type == "flag")

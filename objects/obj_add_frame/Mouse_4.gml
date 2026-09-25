@@ -1,3 +1,5 @@
+if (variable_global_exists("phase_check_window_open") && global.phase_check_window_open) exit;
+
 switch (image_index)
 {
 	case 0:

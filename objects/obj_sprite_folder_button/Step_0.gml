@@ -29,6 +29,8 @@ if (hovering && mouse_check_button_pressed(mb_left))
     global.selected_sprite_folder_name = sprite_folder_name;
     global.selected_sprite_folder_path = sprite_folder_path;
     global.selected_gml_path = related_gml_path;
+    global.selected_attack_gml_path = related_gml_path;
+    global.selected_attack_name = attack_name;
 
     show_debug_message("Selected sprite folder:");
     show_debug_message(sprite_folder_name);

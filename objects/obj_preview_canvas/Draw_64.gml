@@ -211,7 +211,8 @@ if (global.hitbox_creation_state != "" && start_new_hb_draw) {
 	var hitbox_function = scr_get_hitbox_create_function_from_type(global.hitbox_creation_type);
 
     var preview_hb = {
-        hitboxCreateFunction: hitbox_function
+        hitboxCreateFunction: hitbox_function,
+        group: 0
     };
 
 	var hitbox_color = scr_get_hitbox_color(preview_hb);

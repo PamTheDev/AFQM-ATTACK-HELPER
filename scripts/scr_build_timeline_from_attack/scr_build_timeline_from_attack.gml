@@ -15,17 +15,6 @@ function scr_build_timeline_from_attack(_attack)
     array_push(timeline.tracks, animation_track);
 
 
-    // Flag track
-
-    var flag_track = {
-        name: "Flags",
-        type: "flag",
-        keys: []
-    };
-
-    array_push(timeline.tracks, flag_track);
-
-
     // Hitbox tracks
 
     var hitbox_tracks = [];
@@ -54,6 +43,7 @@ function scr_build_timeline_from_attack(_attack)
         // That is 17 timeline frames.
         var phase_length = phase_lasts + 1;
 
+        var phase_flags = [];
 
         if (variable_struct_exists(phase, "flags"))
         {
@@ -87,16 +77,9 @@ function scr_build_timeline_from_attack(_attack)
                     phase_flag.scope = "phase";
                 }
 
-                array_push(flag_track.keys, {
-                    start: phase_start,
-                    duration: 1,
-
-                    flag: phase_flag,
-
-                    phase_index: p,
-                    source_countdown_frame: phase_lasts,
-                    source_phase: phase
-                });
+                // Phase flags belong to the phase itself and are edited from
+                // the phase panel. Only frame flags appear on the Flags track.
+                array_push(phase_flags, phase_flag);
             }
         }
 
@@ -146,6 +129,24 @@ function scr_build_timeline_from_attack(_attack)
                     for (var h = 0; h < array_length(frame_data.hitboxes); h++)
                     {
                         var hb = frame_data.hitboxes[h];
+
+                        // SFX values are GML sound references/expressions. Normalize legacy
+                        // numeric JSON values to strings so subsequent saves preserve the type.
+                        if (variable_struct_exists(hb, "sfx"))
+                        {
+                            hb.sfx = string(hb.sfx);
+                        }
+                        else
+                        {
+                            hb.sfx = "";
+                        }
+
+                        // Older attack JSON may not include a hitbox group.
+                        // Normalize it here so every hitbox in the editor has one.
+                        if (!variable_struct_exists(hb, "group"))
+                        {
+                            hb.group = 0;
+                        }
 
                         var track_index = h + 1;
 
@@ -223,7 +224,15 @@ function scr_build_timeline_from_attack(_attack)
                             flag.scope = "frame";
                         }
 
-                        array_push(flag_track.keys, {
+                        // Reuse a flag track when this frame is free. If every
+                        // flag track is occupied here, create the next track.
+                        var flag_track_index = scr_get_or_create_available_flag_track(
+                            timeline,
+                            absolute_frame,
+                            1
+                        );
+
+                        array_push(timeline.tracks[flag_track_index].keys, {
                             start: absolute_frame,
                             duration: 1,
 
@@ -238,13 +247,21 @@ function scr_build_timeline_from_attack(_attack)
             }
         }
 
+        var phase_attack_stop_state = "none";
+
+        if (variable_struct_exists(phase, "attackStopState"))
+        {
+            phase_attack_stop_state = string(phase.attackStopState);
+        }
 
         array_push(timeline.phases, {
             name: "Phase " + string(p),
             start: phase_start,
             duration: phase_length,
             phase_index: p,
-            lasts: max(0, phase_length - 1)
+            lasts: max(0, phase_length - 1),
+            flags: phase_flags,
+            attack_stop_state: phase_attack_stop_state
         });
 
         phase_start += phase_length;
@@ -253,6 +270,8 @@ function scr_build_timeline_from_attack(_attack)
     timeline.total_frames = phase_start;
 
     scr_sort_all_timeline_tracks(timeline);
-
+	
+	scr_cull_redundant_flags(timeline)
+	
     return timeline;
 }

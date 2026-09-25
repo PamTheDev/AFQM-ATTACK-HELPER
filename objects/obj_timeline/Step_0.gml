@@ -1,3 +1,8 @@
+if (variable_global_exists("phase_check_window_open") && global.phase_check_window_open)
+{
+    exit;
+}
+
 if (is_undefined(timeline))
 {
     if (variable_global_exists("timeline"))
@@ -165,6 +170,10 @@ if (phase_drag_mode != "none")
 
 if (mouse_in_phase_area && mouse_check_button_pressed(mb_left))
 {
+    // Commit any code edit for the previously selected phase before changing
+    // which phase owns the phase-panel code box.
+    scr_clear_text_input_focus();
+
     global.selected_phase_index = -1;
 
     phase_drag_mode = "none";
@@ -202,11 +211,16 @@ if (mouse_in_phase_area && mouse_check_button_pressed(mb_left))
         else if (inside_phase)
         {
             global.selected_phase_index = p;
-			//scr_show_only_text_input_group("phase");
             show_debug_message("Selected phase:");
             show_debug_message(timeline.phases[p].name);
             break;
         }
+    }
+
+    if (global.selected_phase_index >= 0)
+    {
+        scr_show_only_text_input_group("phase");
+        scr_refresh_text_input_group("phase");
     }
 
     exit;

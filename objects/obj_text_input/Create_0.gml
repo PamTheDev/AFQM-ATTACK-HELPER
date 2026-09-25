@@ -37,6 +37,7 @@ text_input_undo_before = undefined;
 text_input_undo_property = "";
 
 input_group = "default";
+flag_type_key = "";
 input_enabled = true;
 text_input_ready = false;
 

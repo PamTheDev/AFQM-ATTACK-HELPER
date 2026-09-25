@@ -1,5 +1,10 @@
 function scr_text_input_get_property_name(_id)
 {
+    if (_id == 201) return "ui_type";
+
+    var flag_input = scr_get_flag_input_definition(_id);
+    if (!is_undefined(flag_input)) return flag_input.field.property;
+
     switch (_id)
     {
         case 0: return "hitboxCreateFunction";
@@ -13,6 +18,10 @@ function scr_text_input_get_property_name(_id)
         case 8: return "hitlag";
         case 9: return "angle";
         case 10: return "duration";
+        case 11: return "vfxStyle";
+        case 12: return "sfx";
+        case 13: return "group";
+        case 300: return "flags";
     }
 
     return "";
@@ -21,6 +30,16 @@ function scr_text_input_get_property_name(_id)
 
 function scr_text_input_get_undo_target(_id)
 {
+    if (_id == 201 || !is_undefined(scr_get_flag_input_definition(_id)))
+    {
+        return scr_get_selected_flag();
+    }
+
+    if (_id == 300)
+    {
+        return scr_get_selected_phase();
+    }
+
     if (_id == 10)
     {
         if (variable_global_exists("selected_hitbox_key"))
@@ -45,6 +64,23 @@ function scr_text_input_read_target_value(_id, _target)
         return undefined;
     }
 
+    if (_id == 201)
+    {
+        return scr_try_infer_flag_submenu(_target);
+    }
+
+    var flag_input = scr_get_flag_input_definition(_id);
+
+    if (!is_undefined(flag_input))
+    {
+        if (variable_struct_exists(_target, flag_input.field.property))
+        {
+            return variable_struct_get(_target, flag_input.field.property);
+        }
+
+        return flag_input.field.default_value;
+    }
+
     if (_id == 0)
     {
         if (variable_struct_exists(_target, "hitboxCreateFunction"))
@@ -63,6 +99,21 @@ function scr_text_input_read_target_value(_id, _target)
         }
 
         return 1;
+    }
+
+    if (_id == 12)
+    {
+        if (variable_struct_exists(_target, "sfx"))
+        {
+            return string(_target.sfx);
+        }
+
+        return "";
+    }
+
+    if (_id == 300)
+    {
+        return scr_get_phase_editor_code(_target);
     }
 
     var prop = scr_text_input_get_property_name(_id);
@@ -86,6 +137,22 @@ function scr_text_input_write_target_value(_id, _target, _value)
     if (is_undefined(_target))
     {
         return false;
+    }
+
+    if (_id == 201)
+    {
+        var type_key = string(_value);
+        global.flag_type_submenu_open = type_key;
+        return scr_apply_flag_type(_target, type_key);
+    }
+
+    var flag_input = scr_get_flag_input_definition(_id);
+
+    if (!is_undefined(flag_input))
+    {
+        _target.ui_type = flag_input.type_key;
+        variable_struct_set(_target, flag_input.field.property, _value);
+        return scr_rebuild_flag_code(_target);
     }
 
     if (_id == 0)
@@ -117,6 +184,31 @@ function scr_text_input_write_target_value(_id, _target, _value)
         }
 
         return true;
+    }
+
+    if (_id == 11)
+    {
+        if (is_string(_value))
+        {
+            _target.vfxStyle = _value;
+        }
+        else
+        {
+            _target.vfxStyle = scr_get_hit_vfx_from_index(_value);
+        }
+
+        return true;
+    }
+
+    if (_id == 12)
+    {
+        _target.sfx = string(_value);
+        return true;
+    }
+
+    if (_id == 300)
+    {
+        return scr_set_phase_editor_code(_target, _value);
     }
 
     var prop = scr_text_input_get_property_name(_id);

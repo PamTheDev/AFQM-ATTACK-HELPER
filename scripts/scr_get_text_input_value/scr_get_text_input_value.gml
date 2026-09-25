@@ -1,5 +1,33 @@
 function scr_get_text_input_value(_id)
 {
+    if (_id == 201)
+    {
+        var type_key = scr_sync_selected_flag_submenu();
+        return scr_get_flag_type_index_from_key(type_key);
+    }
+
+    var flag_input = scr_get_flag_input_definition(_id);
+
+    if (!is_undefined(flag_input))
+    {
+        var selected_flag = scr_get_selected_flag();
+
+        if (is_undefined(selected_flag)) return flag_input.field.default_value;
+
+        scr_try_infer_flag_submenu(selected_flag);
+
+        if (!variable_struct_exists(selected_flag, flag_input.field.property))
+        {
+            variable_struct_set(
+                selected_flag,
+                flag_input.field.property,
+                flag_input.field.default_value
+            );
+        }
+
+        return variable_struct_get(selected_flag, flag_input.field.property);
+    }
+
     switch (_id)
     {
         
@@ -33,31 +61,85 @@ function scr_get_text_input_value(_id)
         case 8: return scr_get_selected_hitbox_number_value("hitlag", 0);
         case 9: return scr_get_selected_hitbox_number_value("angle", 0);
 		case 10: return scr_get_selected_hitbox_key_duration();
+
+        // Hit VFX dropdown
+        case 11:
+        {
+            var hb = scr_get_selected_hitbox();
+
+            if (!is_undefined(hb))
+            {
+                if (variable_struct_exists(hb, "vfxStyle"))
+                {
+                    return scr_get_hit_vfx_index(hb.vfxStyle);
+                }
+            }
+
+            return 0;
+        }
+
+        // Hit SFX text
+        case 12:
+        {
+            var hb = scr_get_selected_hitbox();
+
+            if (is_undefined(hb))
+            {
+                return "";
+            }
+
+            if (!variable_struct_exists(hb, "sfx"))
+            {
+                hb.sfx = "";
+            }
+
+            return string(hb.sfx);
+        }
+
+        // Hitbox group
+        case 13: return scr_get_selected_hitbox_number_value("group", 0);
+
         // Animation frame properties
         case 100: return scr_get_selected_animation_key_number_value("start", 0);
         case 101: return scr_get_selected_animation_key_number_value("animation_frame", 0);
-		// Flag properties
-		case 200: {
-			var flag = scr_get_selected_flag();
-
-			if (is_undefined(flag))
-			{
-				return "";
-			}
-
-			if (!variable_struct_exists(flag, "code"))
-			{
-				flag.code = "";
-			}
-
-			return flag.code;
-		}
-		case 201: return global.current_flag_add;
+        // Phase flags/code
+        case 300:
+        {
+            return scr_get_phase_editor_code(scr_get_selected_phase());
+        }
 	}
 }
 
 function scr_update_text_input(_id, _input)
 {
+    if (_id == 201)
+    {
+        scr_set_selected_flag_type(_input);
+        scr_refresh_flag_type_submenu();
+        scr_refresh_text_input_group("flag");
+        return;
+    }
+
+    var flag_input = scr_get_flag_input_definition(_id);
+
+    if (!is_undefined(flag_input))
+    {
+        var selected_flag = scr_get_selected_flag();
+
+        if (!is_undefined(selected_flag))
+        {
+            selected_flag.ui_type = flag_input.type_key;
+            global.flag_type_submenu_open = flag_input.type_key;
+            variable_struct_set(selected_flag, flag_input.field.property, string(_input));
+            scr_rebuild_flag_code(selected_flag);
+
+            mark_attack_json_dirty();
+            scr_save_current_attack_json();
+        }
+
+        return;
+    }
+
     switch (_id)
     {
         
@@ -144,6 +226,52 @@ function scr_update_text_input(_id, _input)
         case 10:
 			scr_set_selected_hitbox_key_duration(_input);
 			break;
+
+        case 11:
+        {
+            var hb = scr_get_selected_hitbox();
+
+            if (!is_undefined(hb))
+            {
+                hb.vfxStyle = scr_get_hit_vfx_from_index(_input);
+
+                mark_attack_json_dirty();
+                scr_save_current_attack_json();
+            }
+
+            break;
+        }
+
+        case 12:
+        {
+            var hb = scr_get_selected_hitbox();
+
+            if (!is_undefined(hb))
+            {
+                var new_sfx = string(_input);
+                var sfx_changed = true;
+
+                if (variable_struct_exists(hb, "sfx"))
+                {
+                    sfx_changed = string(hb.sfx) != new_sfx;
+                }
+
+                if (sfx_changed)
+                {
+                    hb.sfx = new_sfx;
+
+                    // The undo/focus-finish path commits this edit to disk once.
+                    // Avoid calling the native filesystem extension per keystroke.
+                    mark_attack_json_dirty();
+                }
+            }
+
+            break;
+        }
+
+        case 13:
+            scr_set_selected_hitbox_number_value("group", _input);
+            break;
 			
 		case 100:
 			scr_set_selected_animation_key_number_value("start", _input);
@@ -151,21 +279,19 @@ function scr_update_text_input(_id, _input)
 		case 101:
 			scr_set_selected_animation_key_number_value("animation_frame", _input);
 			break;
-			case 200:
-{
-    var flag = scr_get_selected_flag();
+        case 300:
+        {
+            var phase = scr_get_selected_phase();
 
-    if (!is_undefined(flag))
-    {
-        flag.type = "code";
-        flag.code = _input;
+            if (!is_undefined(phase))
+            {
+                scr_set_phase_editor_code(phase, _input);
+                mark_attack_json_dirty();
+                scr_save_current_attack_json();
+            }
 
-        mark_attack_json_dirty();
-        scr_save_current_attack_json();
-    }
-
-    break;
-}
+            break;
+        }
     }
 }
 
@@ -173,6 +299,15 @@ function scr_initiate_text_value(_id, _input = "", _array = "")
 {
     numbers_only = false;
     text_input_type = "input";
+
+    var flag_input = scr_get_flag_input_definition(_id);
+
+    if (!is_undefined(flag_input))
+    {
+        text_input_type = flag_input.field.input_type;
+        numbers_only = flag_input.field.numbers_only;
+        return;
+    }
 
     switch (_id)
     {
@@ -208,9 +343,33 @@ function scr_initiate_text_value(_id, _input = "", _array = "")
             break;
         }
 
+        // Hit VFX dropdown
+        case 11:
+        {
+            text_input_type = "dropdown";
+            numbers_only = false;
+            break;
+        }
+
+        // Flag type dropdown
+        case 201:
+        {
+            text_input_type = "dropdown";
+            numbers_only = false;
+            break;
+        }
+
+        // Hit SFX is a sound asset name or another GML expression.
+        case 12:
+        {
+            text_input_type = "input";
+            numbers_only = false;
+            break;
+        }
+
         
         // Numeric hitbox inputs
-        case 200:
+        case 300:
 		{
 			text_input_type = "codebox";
 			numbers_only = false;
@@ -226,6 +385,7 @@ function scr_initiate_text_value(_id, _input = "", _array = "")
         case 8:
         case 9:
 		case 10:
+		case 13:
 		case 100:
 		case 101:
         {
@@ -242,6 +402,12 @@ function scr_get_text_list(_id)
     {
         case 0:
             return scr_get_hitbox_function_list();
+
+        case 11:
+            return scr_get_hit_vfx_list();
+
+        case 201:
+            return scr_get_flag_type_names();
     }
 
     return [];
@@ -279,6 +445,57 @@ function scr_get_hitbox_function_from_index(_index)
 
     return list[_index];
 }
+
+function scr_get_hit_vfx_list()
+{
+    return [
+        "normal_weak",
+        "normal_medium",
+        "normal_strong",
+        "slash_weak",
+        "slash_medium",
+        "slash_strong",
+        "electric_weak",
+        "electric",
+        "magic",
+        "grab",
+        "explosion",
+        "splash",
+        "shield",
+        "shield_projectile",
+        "spin",
+        "lines",
+        "emphasis",
+        "shine",
+        "custom",
+        "none"
+    ];
+}
+
+function scr_get_hit_vfx_index(_vfx_style)
+{
+    var list = scr_get_hit_vfx_list();
+
+    for (var i = 0; i < array_length(list); i++)
+    {
+        if (_vfx_style == list[i] || _vfx_style == "HIT_VFX." + list[i])
+        {
+            return i;
+        }
+    }
+
+    return 0;
+}
+
+function scr_get_hit_vfx_from_index(_index)
+{
+    var list = scr_get_hit_vfx_list();
+
+    _index = clamp(floor(real(_index)), 0, array_length(list) - 1);
+
+    return "HIT_VFX." + list[_index];
+}
+
 function scr_get_selected_hitbox()
 {
     if (!variable_global_exists("selected_hitbox"))
@@ -518,4 +735,3 @@ function scr_refresh_text_input_group(_group)
         }
     }
 }
-

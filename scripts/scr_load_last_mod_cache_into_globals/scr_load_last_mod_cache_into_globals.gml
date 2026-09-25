@@ -80,16 +80,7 @@ function scr_load_last_mod_cache_into_globals()
         if (!variable_struct_exists(folder_data, "path")) continue;
         if (!variable_struct_exists(folder_data, "gml_path")) continue;
 
-        var folder_name = folder_data.name;
-        var folder_path = scr_normalize_folder_path(folder_data.path);
         var gml_path = string_replace_all(folder_data.gml_path, "\\", "/");
-
-        if (!directory_exists(folder_path))
-        {
-            show_debug_message("Skipping cached folder because folder is missing:");
-            show_debug_message(folder_path);
-            continue;
-        }
 
         if (!file_exists(gml_path))
         {
@@ -98,10 +89,35 @@ function scr_load_last_mod_cache_into_globals()
             continue;
         }
 
+        if (!scr_is_attack_gml(gml_path))
+        {
+            show_debug_message("Skipping cached GML because it is not an attack:");
+            show_debug_message(gml_path);
+            continue;
+        }
+
+        var attack_name = scr_get_attack_key_from_gml_path(gml_path);
+        var folder_name = "spr_" + attack_name;
+        var folder_path = scr_normalize_folder_path(sprite_root + folder_name);
+
+        if (attack_name == "")
+        {
+            show_debug_message("Skipping cached attack because its filename has no attack name:");
+            show_debug_message(gml_path);
+            continue;
+        }
+
+        if (!directory_exists(folder_path))
+        {
+            show_debug_message("Cached attack has no sprite folder; its button will still be created:");
+            show_debug_message(folder_path);
+        }
+
         array_push(global.sprite_folders, {
             name: folder_name,
             path: folder_path,
-            gml_path: gml_path
+            gml_path: gml_path,
+            attack_name: attack_name
         });
     }
 
@@ -109,7 +125,7 @@ function scr_load_last_mod_cache_into_globals()
 
     if (global.sprite_folder_count <= 0)
     {
-        show_debug_message("Cached mod had no valid sprite folders.");
+        show_debug_message("Cached mod had no valid attacks.");
         return false;
     }
 
@@ -117,7 +133,7 @@ function scr_load_last_mod_cache_into_globals()
 
     show_debug_message("Loaded cached mod:");
     show_debug_message(global.mod_root);
-    show_debug_message("Cached valid sprite folders:");
+    show_debug_message("Cached valid attacks:");
     show_debug_message(string(global.sprite_folder_count));
 
     return true;

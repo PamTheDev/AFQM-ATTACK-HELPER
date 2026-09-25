@@ -24,7 +24,11 @@ function scr_codebox_update_input(_id)
         keyboard_string = text;
     }
 
-    current_input = keyboard_string;
-
-    scr_update_text_input(_id, current_input);
+    // Only update the model when the code actually changed. This also prevents
+    // redundant per-frame JSON writes while the codebox remains focused.
+    if (keyboard_string != current_input)
+    {
+        current_input = keyboard_string;
+        scr_update_text_input(_id, current_input);
+    }
 }
