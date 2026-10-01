@@ -1,3 +1,5 @@
+if (variable_global_exists("new_attack_window_open") && global.new_attack_window_open) exit;
+
 show_debug_message("Selected sprite folder:");
 show_debug_message(sprite_folder_name);
 show_debug_message(sprite_folder_path);

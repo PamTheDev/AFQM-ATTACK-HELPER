@@ -1,29 +1,30 @@
-show_debug_message("EDIT BUTTON CLICKED");
-
-var gml_path = global.selected_attack_gml_path;
-
-var save_root = string_replace_all(game_save_id, "\\", "/");
-
-if (string_char_at(save_root, string_length(save_root)) != "/")
+if (
+    window_open ||
+    global.loading_sprite_buttons ||
+    (variable_global_exists("new_attack_window_open") && global.new_attack_window_open)
+)
 {
-    save_root += "/";
+    exit;
 }
 
-var json_path = save_root + "attack_json/" + global.selected_sprite_folder_name + ".json";
-
-show_debug_message("GML path:");
-show_debug_message(gml_path);
-
-show_debug_message("JSON path:");
-show_debug_message(json_path);
-
-if (scr_run_attack_parser(gml_path, json_path))
+for (var old_preview = 0; old_preview < array_length(preview_sprites); old_preview++)
 {
-    show_debug_message("Parser started. Starting Alarm 0.");
-    parser_check_attempts = 0;
-    alarm[0] = 10;
+    if (sprite_exists(preview_sprites[old_preview]))
+    {
+        sprite_delete(preview_sprites[old_preview]);
+    }
 }
-else
-{
-    show_debug_message("ERROR: Parser did not start.");
-}
+
+preview_sprites = [];
+preview_sprite = -1;
+sprite_f = 0;
+
+window_open = true;
+name_focused = true;
+attack_name = "";
+selected_folder_path = "";
+selected_folder_name = "";
+status_text = "";
+status_is_error = false;
+global.new_attack_window_open = true;
+keyboard_string = attack_name;
