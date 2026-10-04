@@ -1,33 +1,40 @@
-if (variable_global_exists("phase_check_window_open") && global.phase_check_window_open)
+mouse_over_context = false;
+if ((variable_global_exists("phase_check_window_open") && global.phase_check_window_open)
+    || (variable_global_exists("new_attack_window_open") && global.new_attack_window_open))
 {
-    global.context_active = false;
+    scr_context_menu_close();
+    exit;
+}
+if (!global.context_active) exit;
+if (!instance_exists(global.context_owner) || keyboard_check_pressed(vk_escape))
+{
+    scr_context_menu_close();
     exit;
 }
 
-if (variable_global_exists("phase_check_window_open") && global.phase_check_window_open)
+refresh_layout();
+var mx = device_mouse_x_to_gui(0);
+var my = device_mouse_y_to_gui(0);
+mouse_over_context = point_in_rectangle(mx, my, global.context_x, global.context_y,
+    global.context_x + menu_w, global.context_y + menu_height);
+
+if (!mouse_check_button_pressed(mb_left)) exit;
+if (!mouse_over_context)
 {
-    global.context_active = false;
+    scr_context_menu_close();
     exit;
 }
-
-var mx = device_mouse_x_to_gui(0)
-var my = device_mouse_y_to_gui(0)
-	
-var full_menu_h =  menu_h * array_length(global.context_items)
-
-mouse_over_context =
-	mx >= global.context_x && 
-	my >= global.context_y && 
-	mx <= global.context_x + menu_w && 
-	my <= global.context_y + full_menu_h;
-		
-if (mouse_check_button_pressed(mb_right)) {
-	global.context_x = mx
-	global.context_y = my
-	global.context_active = true
-}
-
-if (global.context_active && !mouse_over_context) {
-	if mouse_check_button_pressed(mb_left)
-		global.context_active = false
+for (var i = 0; i < array_length(menu_rows); i++)
+{
+    var row = menu_rows[i];
+    var row_top = global.context_y + row.top;
+    if (my >= row_top && my < row_top + menu_h)
+    {
+        if (!scr_context_menu_input_enabled(row.input)) exit;
+        var menu_owner = global.context_owner;
+        var menu_action = row.input[$ "function"];
+        scr_context_menu_close();
+        method(menu_owner, menu_action)();
+        exit;
+    }
 }
