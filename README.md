@@ -1,11 +1,12 @@
 # AFQM ATTACK HELPER
 Attack editor for AFQM and other PFE games
-
+## THIS PROGRAM IS STILL IN ALPHA
+Some menus may not fully work as intended, there may be some glitches in rendering, there may even be some glitches in exporting, all things expected in an alpha launch. But, this is currently meant for use in testing the existing features, not for full development **CURRENTLY**.
 ## This is **NOT** a program that you can draw in.
 The primary goal of this program is to lower the barrier of entry and make the coding experience a lot more beginner friendly rather than coding most aspects.
 # Organization
 
-Mods in the engine's beta are organized as the following:
+Mods in the program's alpha are organized as the following:
 - Root mod folder 
   - Scripts
   - Sprites
@@ -18,10 +19,10 @@ Scripts are where the gml files are located. Only scripts that are identified as
 Sprites are where all the characters sprites/ animations are stored. Each animation has its own folder named after the sprite (i.e. "spr_stick_dtilt"); Inside of each folder is an image file for each frame of animation with two naming conventions: name + _frame # (i.e. "spr_stick_dtilt_0.png" for the first frame), and 000 + frame # (i.e. "0000.png" for the first frame). Since they are stored very specifically, there are 2 methods to storing them correctly. 
 
 ## 1. Automatically through GIFs
-The engine automatically re-formats any GIF files into the proper format for the engine to use in the 000# naming convention. This is the recommended method when utilizing the engine.
+The program automatically re-formats any GIF files into the proper format for the program to use in the 000# naming convention. This is the recommended method when utilizing the program.
 
 ## 2. Manually
-You can of course manually export each sprite 1 by 1 if that is what you want to do, as long as the sprites are named correctly there will be no issues in the engine.
+You can of course manually export each sprite 1 by 1 if that is what you want to do, as long as the sprites are named correctly there will be no issues in the program.
 
 # Program Features
 This section explains the function of the features that exist in the program as a whole, the next section explains the function of the _editor_ itself.
