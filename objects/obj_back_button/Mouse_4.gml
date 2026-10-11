@@ -1,3 +1,5 @@
+if (variable_global_exists("context_click_consumed") && global.context_click_consumed) exit;
+
 if (variable_global_exists("phase_check_window_open") && global.phase_check_window_open) exit;
 
 // Finish any active editor input before releasing its target data.
@@ -19,6 +21,8 @@ scr_clear_flag_selection();
 global.selected_phase_index = -1;
 global.current_timeline_frame = 0;
 global.undo_history = [];
+global.redo_history = [];
+scr_context_menu_close();
 global.menu_focus = "default";
 
 global.timeline = undefined;

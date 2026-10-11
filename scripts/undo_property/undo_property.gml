@@ -277,6 +277,7 @@ function scr_text_input_finish_property_undo()
             global.undo_history = [];
         }
 
+        global.redo_history = [];
         array_push(global.undo_history, {
             type: "hitbox_property_edit",
             input_id: text_input_undo_id,

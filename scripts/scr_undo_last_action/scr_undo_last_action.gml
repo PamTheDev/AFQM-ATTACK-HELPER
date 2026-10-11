@@ -18,7 +18,12 @@ function scr_undo_last_action()
 
     array_delete(global.undo_history, count - 1, 1);
 
-    if (action.type == "hitbox_transform")
+    global.history_restoring = true;
+    action.redo_state = scr_context_capture_timeline();
+    if (!variable_global_exists("redo_history")) global.redo_history = [];
+    array_push(global.redo_history, action);
+    if (action.type == "context_edit") scr_context_restore_timeline(action.before);
+    else if (action.type == "hitbox_transform")
     {
         scr_apply_hitbox_state(action.target, action.before);
 
@@ -115,4 +120,13 @@ function scr_undo_last_action()
     show_debug_message("Undid hitbox property edit:");
     show_debug_message(action.property);
 }
+    if (action.type != "context_edit")
+    {
+        scr_sort_all_timeline_tracks(global.timeline);
+        scr_recalculate_timeline_total_frames(global.timeline);
+        scr_timeline_refresh_phase_indices(global.timeline);
+        mark_attack_json_dirty();
+        scr_save_current_attack_json();
+    }
+    global.history_restoring = false;
 }

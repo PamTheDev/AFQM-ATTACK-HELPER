@@ -1,9 +1,12 @@
-// Capture before any normal Step event so menu clicks cannot also select
-// the folder underneath, regardless of instance event order.
 global.context_click_consumed = false;
+if (mouse_check_button_pressed(mb_right) && instance_exists(obj_timeline)
+    && !(variable_global_exists("phase_check_window_open") && global.phase_check_window_open)
+    && !(variable_global_exists("new_attack_window_open") && global.new_attack_window_open))
+{
+    scr_clear_text_input_focus();
+    scr_context_menu_open("attack", instance_find(obj_timeline, 0));
+}
 if (!global.context_active) exit;
 refresh_layout();
-global.context_click_consumed = mouse_check_button_pressed(mb_left)
-    && point_in_rectangle(device_mouse_x_to_gui(0), device_mouse_y_to_gui(0),
-        global.context_x, global.context_y,
-        global.context_x + menu_w, global.context_y + menu_height);
+// Consume the dismissing click too, to avoid editing underneath an open menu.
+global.context_click_consumed = mouse_check_button_pressed(mb_left);

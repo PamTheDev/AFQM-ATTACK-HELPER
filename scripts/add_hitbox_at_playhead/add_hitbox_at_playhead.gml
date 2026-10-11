@@ -169,6 +169,7 @@ function scr_add_hitbox_at_playhead(_timeline, _x, _y, _xScale, _yScale, _type)
     // Optional undo entry.
     if (variable_global_exists("undo_history"))
     {
+        global.redo_history = [];
         array_push(global.undo_history, {
             type: "hitbox_key_added",
             key: new_key,

@@ -1,5 +1,12 @@
 function scr_build_timeline_from_attack(_attack)
 {
+    if (variable_struct_exists(_attack, "editorTimeline"))
+    {
+        var saved = variable_clone(_attack.editorTimeline);
+        scr_sort_all_timeline_tracks(saved);
+        scr_recalculate_timeline_total_frames(saved);
+        return saved;
+    }
     var timeline = {
         total_frames: 0,
         phases: [],

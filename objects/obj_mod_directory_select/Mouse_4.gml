@@ -1,3 +1,5 @@
+if (variable_global_exists("context_click_consumed") && global.context_click_consumed) exit;
+
 var selected_folder = get_directory("Select the mod folder");
 
 if (selected_folder != "")
