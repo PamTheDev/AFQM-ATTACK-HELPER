@@ -58,3 +58,16 @@ The select menu is a list of attacks with two buttons on the bottom of the scree
   - <img width="836" height="577" alt="image" src="https://github.com/user-attachments/assets/b9329ad9-44e4-4f04-aaa5-285bc62f6f33" />
 
 # Editor Features
+This section explains the features within the main editor.
+<img width="1365" height="767" alt="image" src="https://github.com/user-attachments/assets/2642e4a6-8b96-4418-9c94-a682490fef95" />
+
+## Display window
+This is where the sprite for the attack is displayed, along with any other info such as any necessary flags and hitboxes.
+## Hitbox selector
+These are the buttons for adding hitboxes to the attack. Selecting one will make it so that the next mouse click on the 'Display window' will add the hitbox and allow for stretching of the hitbox.
+## Editor Timeline
+
+The editor timeline hosts a handful of features so this section will describe them.
+<img width="986" height="226" alt="image" src="https://github.com/user-attachments/assets/60a05d07-0e35-4e87-bfd4-f96e25aa46c0" />
+
+## Edit Panel
