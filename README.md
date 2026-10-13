@@ -39,7 +39,7 @@ Below is a list of keybinds featured in the program:
 This menu alows you to select a mod folder and to "Quick load" a mod. Once a mod is selected it combs through the folder converting any GIF files to sprite folders, identifying proper attacks, and caches all the information. 
 This process usually takes around 5-20 seconds depending on how many gifs need converting, or how many attacks there are in total. Once a mod is loaded and cached it can be "Quick loaded". Quick loading a mod will not search for any new attack files, or attempt to convert any GIF files, it will only load the same attacks that were last loaded in the program.
 
-## Context menu
+### Context menu
 <img width="213" height="207" alt="image" src="https://github.com/user-attachments/assets/f146ad5f-95e3-4191-a52e-f7c447f7ffaf" />
 
 The context menu is accessed via right mouse click. This menu is, of course, context based, meaning only right-clicking some buttons or menus will create a context menu.
@@ -50,9 +50,9 @@ The context menu is accessed via right mouse click. This menu is, of course, con
 The select menu is a list of attacks with two buttons on the bottom of the screen: New Attack and Edit.
 
 - Attack Buttons
-	- Attack buttons can be selected and must be selected in order for the 'Edit' button to function. They can also be double clicked or right-clicked to perform the same action as pressing the 'Edit' button.
+	- Attack buttons can be selected and must be selected in order for the Edit button to function. They can also be double clicked or right-clicked to perform the same action as pressing the Edit button.
 - Edit Button
-	- The 'Edit' button opens the main editor. An attack must be selected in order for the button to function.
+	- The Edit button opens the main editor. An attack must be selected in order for the button to function.
 - New Attack Button
 	- The 'New Attack' button opens up a window that allows you to name a new attack, attach an animation, then go to the main editor to fill the new attack.
   - <img width="836" height="577" alt="image" src="https://github.com/user-attachments/assets/b9329ad9-44e4-4f04-aaa5-285bc62f6f33" />
@@ -61,13 +61,29 @@ The select menu is a list of attacks with two buttons on the bottom of the scree
 This section explains the features within the main editor.
 <img width="1365" height="767" alt="image" src="https://github.com/user-attachments/assets/2642e4a6-8b96-4418-9c94-a682490fef95" />
 
-## Display window
+### Display window
 This is where the sprite for the attack is displayed, along with any other info such as any necessary flags and hitboxes.
-## Hitbox selector
-These are the buttons for adding hitboxes to the attack. Selecting one will make it so that the next mouse click on the 'Display window' will add the hitbox and allow for stretching of the hitbox.
+### Hitbox selector
+These are the buttons for adding hitboxes to the attack. Selecting one will make it so that the next mouse click on the Display window will add the hitbox and allow for stretching of the hitbox.
+
+
 ## Editor Timeline
 
 The editor timeline hosts a handful of features so this section will describe them.
 <img width="986" height="226" alt="image" src="https://github.com/user-attachments/assets/60a05d07-0e35-4e87-bfd4-f96e25aa46c0" />
 
+### Playhead and Header
+The playhead is the arrow and green line on the timeline. It shows the current frame that the attack is on. You can click anywhere on the timeline to move the playhead to that frame.
+
+The header is above all the tracks and labels the frame numbers. Clicking and dragging the header will move the playhead to that position.
+
+### Keys and Tracks
+There are
+
+### Phase Tags
+
+## Editor Features Cont.
+### Play/Pause and Next/Previous frame buttons
+Above the timeline
+### New Animation and Flag key buttons
 ## Edit Panel
