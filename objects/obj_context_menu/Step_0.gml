@@ -6,6 +6,13 @@ if ((variable_global_exists("phase_check_window_open") && global.phase_check_win
     exit;
 }
 if (!global.context_active) exit;
+// A menu opened by a Mouse event must not select or dismiss on that same click.
+if (variable_global_exists("context_ignore_opening_click") && global.context_ignore_opening_click)
+{
+    global.context_ignore_opening_click = false;
+    refresh_layout();
+    exit;
+}
 if (!instance_exists(global.context_owner) || keyboard_check_pressed(vk_escape))
 {
     scr_context_menu_close();

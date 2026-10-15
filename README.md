@@ -36,6 +36,10 @@ Below is a list of keybinds featured in the program:
 
 To export the current attack, use the Save button in the editor. Undo and Redo are also available through the editor's context menus.
 
+Save offers **UMT** and **Workshop** export formats. UMT converts engine enum references to `UnknownEnum.Value_#` (negative values use `Value_m#`) and adds a sorted definition of the values used at the bottom of the script. Workshop retains named engine enums and converts imported `UnknownEnum` references to numeric values without adding a placeholder enum definition. Cancel closes the format chooser without saving.
+
+The standalone converter accepts `JsonToGmlConverter.exe <input_json_path> <output_gml_path> [UMT|Workshop]`. Omitting the format uses Workshop, including when initially creating a new attack. Enum conversion uses the engine values in the attack helper's enum catalog; custom enum definitions are outside this catalog.
+
 ## Mod Folder Select Menu
 <img width="1367" height="767" alt="image" src="https://github.com/user-attachments/assets/7398f857-fa38-4ce9-a240-589270fc5bf2" />
 

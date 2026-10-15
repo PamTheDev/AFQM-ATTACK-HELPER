@@ -36,7 +36,7 @@ function scr_context_menu_set_definition(_definition)
 
 // The clicked object chooses the key, just like menu_focus. Both callbacks
 // run with self bound to _owner and take no arguments.
-function scr_context_menu_open(_key, _owner = id)
+function scr_context_menu_open(_key, _owner = id, _include_history = true, _ignore_opening_click = false)
 {
     scr_context_menu_init();
     if (!instance_exists(_owner)) return false;
@@ -48,7 +48,7 @@ function scr_context_menu_open(_key, _owner = id)
     var definition = global.context_definitions[$ _key];
     global.context_menu = _key;
     global.context_items = scr_context_copy_array(definition.inputs);
-    if (variable_global_exists("timeline") && !is_undefined(global.timeline))
+    if (_include_history && variable_global_exists("timeline") && !is_undefined(global.timeline))
     {
         array_push(global.context_items, scr_context_menu_input("Undo", 99, function() { scr_undo_last_action(); }, function() { return variable_global_exists("undo_history") && array_length(global.undo_history) > 0; }));
         array_push(global.context_items, scr_context_menu_input("Redo", 99, function() { scr_redo_last_action(); }, function() { return variable_global_exists("redo_history") && array_length(global.redo_history) > 0; }));
@@ -59,6 +59,7 @@ function scr_context_menu_open(_key, _owner = id)
     global.context_x = device_mouse_x_to_gui(0);
     global.context_y = device_mouse_y_to_gui(0);
     global.context_active = array_length(global.context_items) > 0;
+    global.context_ignore_opening_click = _ignore_opening_click;
     return global.context_active;
 }
 
