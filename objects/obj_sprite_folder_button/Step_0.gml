@@ -1,3 +1,8 @@
+if (variable_global_exists("new_attack_window_open") && global.new_attack_window_open)
+{
+    exit;
+}
+
 hovered =
     mouse_x >= x &&
     mouse_x <= x + button_width &&
@@ -23,7 +28,10 @@ var hovering = point_in_rectangle(
     y + bh
 );
 
-if (hovering && mouse_check_button_pressed(mb_left))
+if (hovering && mouse_check_button_pressed(mb_right)) {
+    scr_context_menu_open("sprite_folder", id);
+}
+if (hovering && mouse_check_button_pressed(mb_left) && !global.context_click_consumed)
 {
     // First click selects the folder.
     global.selected_sprite_folder_name = sprite_folder_name;

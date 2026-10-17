@@ -415,6 +415,7 @@
     {"id":{"name":"rm_spr_folders","path":"rooms/rm_spr_folders/rm_spr_folders.yy",},},
     {"id":{"name":"add_hitbox_at_playhead","path":"scripts/add_hitbox_at_playhead/add_hitbox_at_playhead.yy",},},
     {"id":{"name":"codebox_tools","path":"scripts/codebox_tools/codebox_tools.yy",},},
+    {"id":{"name":"context_menu_tools","path":"scripts/context_menu_tools/context_menu_tools.yy",},},
     {"id":{"name":"convert_gif_gml","path":"scripts/convert_gif_gml/convert_gif_gml.yy",},},
     {"id":{"name":"enums","path":"scripts/enums/enums.yy",},},
     {"id":{"name":"generate_image_name","path":"scripts/generate_image_name/generate_image_name.yy",},},

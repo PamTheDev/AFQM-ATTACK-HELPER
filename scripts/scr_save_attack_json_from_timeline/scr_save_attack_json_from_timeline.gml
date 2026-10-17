@@ -39,6 +39,9 @@ function scr_save_attack_json_from_timeline(_timeline, _json_path)
     };
 
     scr_timeline_ensure_phases(_timeline);
+    // Retain editor segments and empty layers while exporting runtime phases.
+    output.editorTimeline = variable_clone(_timeline);
+    _timeline = scr_timeline_runtime_phases(_timeline);
     scr_sort_all_timeline_tracks(_timeline);
     scr_recalculate_timeline_total_frames(_timeline);
 
@@ -58,6 +61,11 @@ function scr_save_attack_json_from_timeline(_timeline, _json_path)
             frames: []
         };
 
+        if (variable_struct_exists(timeline_phase, "extension_frames"))
+        {
+            json_phase.extensionFrames = timeline_phase.extension_frames;
+            json_phase.extensionBaseLasts = timeline_phase.extension_base_lasts;
+        }
         if (variable_struct_exists(timeline_phase, "or"))
         {
             json_phase.or = timeline_phase.or;

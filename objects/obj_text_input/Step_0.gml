@@ -1,3 +1,4 @@
+if (variable_global_exists("context_active") && (global.context_active || global.context_click_consumed)) exit;
 if (variable_global_exists("phase_check_window_open") && global.phase_check_window_open)
 {
     exit;

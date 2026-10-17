@@ -107,9 +107,37 @@ if (panning_canvas)
 
 if (keyboard_check(vk_control) && keyboard_check_pressed(ord("Z")) && global.hitbox_creation_state == "")
 {
-    scr_undo_last_action();
+    if (keyboard_check(vk_shift)) scr_redo_last_action();
+    else scr_undo_last_action();
 }
 
+
+if (mouse_over_canvas && mouse_check_button_pressed(mb_right))
+{
+    var active = scr_get_active_hitboxes(global.timeline, global.current_timeline_frame);
+    for (var i = array_length(active) - 1; i >= 0; i--)
+    {
+        var hb = active[i];
+        var cx = preview_origin_x + canvas_pan_x + hb.x * canvas_zoom;
+        var cy = preview_origin_y + canvas_pan_y + hb.y * canvas_zoom;
+        var hw = max(4, hb.xScale * hitbox_pixel_scale * canvas_zoom) / 2;
+        var hh = max(4, hb.yScale * hitbox_pixel_scale * canvas_zoom) / 2;
+        if (!point_in_rectangle(mx, my, cx - hw, cy - hh, cx + hw, cy + hh)) continue;
+        scr_select_hitbox_from_hitbox(global.timeline, hb);
+        scr_show_only_text_input_group("hitbox");
+        var children = [];
+        var types = scr_get_hitbox_function_list();
+        for (var t = 0; t < array_length(types); t++)
+            array_push(children, scr_context_menu_input(types[t], 1, scr_context_type_action(hb, types[t], false)));
+        var entry = scr_context_menu_input("Change type >", 1, function() {});
+        entry.children = children;
+        scr_context_menu_set_definition({ key: "preview_hitbox", inputs: [entry] });
+        scr_context_menu_open("preview_hitbox", id);
+        break;
+    }
+    exit;
+}
+if (global.context_active || global.context_click_consumed) exit;
 
 // Mouse press: select hitbox or start dragging/resizing
 
@@ -240,7 +268,8 @@ if (mouse_check_button_released(mb_left))
 
         if (!scr_hitbox_states_equal(undo_before_state, after_state))
         {
-            array_push(global.undo_history, {
+            global.redo_history = [];
+        array_push(global.undo_history, {
                 type: "hitbox_transform",
                 target: undo_target_hitbox,
                 before: undo_before_state,

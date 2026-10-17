@@ -1,3 +1,5 @@
+if (variable_global_exists("new_attack_window_open") && global.new_attack_window_open) exit;
+
 show_debug_message("EDIT BUTTON CLICKED");
 
 var gml_path = global.selected_attack_gml_path;

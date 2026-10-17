@@ -183,7 +183,7 @@ function scr_timeline_resize_phase_left(_timeline, _phase_index, _new_left_frame
 }
 
 
-function scr_timeline_add_phase_after(_timeline, _phase_index, _duration)
+function scr_timeline_add_phase_after(_timeline, _phase_index, _duration = 4)
 {
     scr_timeline_ensure_phases(_timeline);
 
@@ -298,6 +298,9 @@ function scr_draw_timeline_phase_tags(_timeline, _scroll_x, _frame_w, _content_w
         }
 
         var phase_color = c_aqua;
+		
+		if (variable_struct_exists(phase, "extend")) && phase.extend
+			phase_color = c_lime;
 
         if (i == _selected_phase)
         {
@@ -321,8 +324,10 @@ function scr_draw_timeline_phase_tags(_timeline, _scroll_x, _frame_w, _content_w
         draw_rectangle(px + pw - 2, bracket_y, px + pw + 2, bracket_bottom, false);
 
         // Name above bracket
-        draw_set_color(c_white);
-        draw_text(px + 4, 0, phase.name);
+		if ( !(variable_struct_exists(phase, "extend")) or !phase.extend) {
+			draw_set_color(c_white);
+			draw_text(px + 4, 0, (variable_struct_exists(phase, "extend") && phase.extend ? "Extend: " : "") + phase.name);
+		}
     }
 
     draw_set_alpha(1);
@@ -392,6 +397,7 @@ function scr_sync_json_phase_lasts_from_timeline(_timeline)
     }
 
     global.attack_json_dirty = true;
+    if (!(variable_global_exists("history_restoring") && global.history_restoring)) global.redo_history = [];
 
     return true;
 }
@@ -997,4 +1003,38 @@ function scr_set_phase_attack_connected_checks(_phase, _states)
     }
 
     return scr_set_phase_flags_code(_phase, output_code, "code");
+}
+
+function scr_timeline_runtime_phases(_source)
+{
+    var result = { phases: [], tracks: _source.tracks, total_frames: _source.total_frames };
+    var pending_start = -1;
+    var pending_duration = 0;
+    var pending_flags = [];
+    for (var p = 0; p < array_length(_source.phases); p++)
+    {
+        var phase = _source.phases[p];
+        if (variable_struct_exists(phase, "extend") && phase.extend && p < array_length(_source.phases) - 1)
+        {
+            if (pending_start < 0) pending_start = phase.start;
+            pending_duration += phase.duration;
+            for (var f = 0; f < array_length(phase.flags); f++) array_push(pending_flags, phase.flags[f]);
+            continue;
+        }
+        var runtime_phase = variable_clone(phase);
+        if (pending_duration > 0)
+        {
+            runtime_phase.start = pending_start;
+            runtime_phase.duration += pending_duration;
+            runtime_phase.lasts = runtime_phase.duration - 1;
+            runtime_phase.extension_frames = pending_duration;
+            runtime_phase.extension_base_lasts = phase.duration - 1;
+            for (var f = 0; f < array_length(pending_flags); f++) array_push(runtime_phase.flags, pending_flags[f]);
+        }
+        array_push(result.phases, runtime_phase);
+        pending_start = -1;
+        pending_duration = 0;
+        pending_flags = [];
+    }
+    return result;
 }

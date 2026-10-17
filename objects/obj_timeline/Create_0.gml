@@ -54,7 +54,7 @@ phase_drag_index = -1;
 
 if (!variable_global_exists("selected_phase_index")) global.selected_phase_index = -1;
 
-new_phase_default_duration = 5;
+new_phase_default_duration = 4;
 
 // Make sure this matches your timeline draw code
 header_w = 120;
@@ -77,3 +77,72 @@ if (!variable_global_exists("selected_animation_key_index")) global.selected_ani
 if (!variable_global_exists("selected_flag_key")) global.selected_flag_key = undefined;
 if (!variable_global_exists("selected_flag_track")) global.selected_flag_track = -1;
 if (!variable_global_exists("selected_flag_key_index")) global.selected_flag_key_index = -1;
+context_track = -1;
+context_key = undefined;
+scr_context_menu_set_definition({ key: "attack", inputs: [] });
+scr_context_menu_set_definition({ key: "phase", inputs: [
+    scr_context_menu_input("Delete Phase", 1, function()
+    {
+        scr_context_edit(method(id, function()
+        {
+            var p = global.selected_phase_index;
+            var removed = timeline.phases[p];
+            array_delete(timeline.phases, p, 1);
+            for (var i = p; i < array_length(timeline.phases); i++) timeline.phases[i].start -= removed.duration;
+            if (array_length(timeline.phases) > 0)
+            {
+                timeline.phases[0].extend = false;
+                timeline.phases[array_length(timeline.phases) - 1].extend = false;
+            }
+            global.selected_phase_index = -1;
+        }));
+    }, function() { return global.selected_phase_index >= 0 && array_length(timeline.phases) > 1; }),
+    scr_context_menu_input("Extend phase", 1, function()
+    {
+        scr_context_edit(method(id, function()
+        {
+            var phase = timeline.phases[global.selected_phase_index];
+            phase.extend = !(variable_struct_exists(phase, "extend") && phase.extend);
+        }));
+    }, function() { return global.selected_phase_index > 0 && global.selected_phase_index < array_length(timeline.phases) - 1; }),
+    scr_context_menu_input("Insert Phase", 1, function()
+    {
+        scr_context_edit(method(id, function()
+        {
+            global.selected_phase_index = scr_timeline_add_phase_after(timeline, global.selected_phase_index, new_phase_default_duration);
+            scr_show_only_text_input_group("phase");
+            scr_refresh_text_input_group("phase");
+        }));
+    }, function() { return global.selected_phase_index >= 0 && global.selected_phase_index < array_length(timeline.phases); })
+] });
+scr_context_menu_set_definition({ key: "layer", inputs: [
+    scr_context_menu_input("New flag layer", 1, function()
+    {
+        scr_context_edit(method(id, function() { scr_create_flag_track(timeline); }));
+    }),
+    scr_context_menu_input("New Hitbox Layer", 1, function()
+    {
+        scr_context_edit(method(id, function()
+        {
+            array_push(timeline.tracks, { name: "Hitbox " + string(scr_count_hitbox_tracks(timeline) + 1), type: "hitbox", keys: [] });
+        }));
+    }),
+    scr_context_menu_input("Delete layer", 2, function()
+    {
+        scr_context_edit(method(id, function()
+        {
+            array_delete(timeline.tracks, context_track, 1);
+            scr_clear_hitbox_selection();
+            scr_clear_animation_selection();
+            global.selected_flag_key = undefined;
+            global.selected_flag_track = -1;
+            selected_track = -1;
+            selected_key = -1;
+            scr_renumber_flag_tracks(timeline);
+            var number = 0;
+            for (var t = 0; t < array_length(timeline.tracks); t++)
+                if (timeline.tracks[t].type == "hitbox") timeline.tracks[t].name = "Hitbox " + string(++number);
+            scr_show_only_text_input_group("default");
+        }));
+    }, function() { return context_track >= 0 && context_track < array_length(timeline.tracks) && timeline.tracks[context_track].type != "animation"; })
+] });

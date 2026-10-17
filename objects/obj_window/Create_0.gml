@@ -122,7 +122,8 @@ close_and_apply = function()
                     global.undo_history = [];
                 }
 
-                array_push(global.undo_history, {
+                global.redo_history = [];
+        array_push(global.undo_history, {
                     type: "phase_attack_stop_state",
                     property: "attack_stop_state",
                     target: target_phase,
@@ -145,7 +146,8 @@ close_and_apply = function()
                     global.undo_history = [];
                 }
 
-                array_push(global.undo_history, {
+                global.redo_history = [];
+        array_push(global.undo_history, {
                     type: "phase_attack_connected_checks",
                     property: "flags",
                     target: target_phase,

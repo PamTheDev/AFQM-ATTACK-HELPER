@@ -76,6 +76,63 @@ var mouse_in_phase_area = point_in_rectangle(
 
 
 
+// Right-click targets use the same geometry as the timeline.
+if (mouse_over_timeline && mouse_check_button_pressed(mb_right))
+{
+    scr_clear_text_input_focus();
+    if (mouse_in_phase_area)
+    {
+        var frame = floor((mx - content_x + scroll_x) / frame_w);
+        global.selected_phase_index = scr_timeline_get_phase_index_at_frame(timeline, frame);
+        scr_show_only_text_input_group("phase");
+        scr_context_menu_open("phase", id);
+        var phase = timeline.phases[global.selected_phase_index];
+        global.context_items[1].label = (variable_struct_exists(phase, "extend") && phase.extend ? "[x] " : "[ ] ") + "Extend phase";
+    }
+    else
+    {
+        context_track = floor((my - track_start_y + scroll_y) / track_h);
+        context_key = undefined;
+        if (context_track >= 0 && context_track < array_length(timeline.tracks))
+        {
+            var track = timeline.tracks[context_track];
+            var frame = (mx - content_x + scroll_x) / frame_w;
+            if (mx >= content_x)
+                for (var k = 0; k < array_length(track.keys); k++)
+                    if (frame >= track.keys[k].start && frame < track.keys[k].start + track.keys[k].duration)
+                    { context_key = track.keys[k]; selected_track = context_track; selected_key = k; break; }
+            if (!is_undefined(context_key) && (track.type == "flag" || track.type == "hitbox"))
+            {
+                var types = [];
+                if (track.type == "flag")
+                {
+                    scr_select_flag_key_by_reference(timeline, context_key);
+                    scr_show_only_text_input_group("flag");
+                    var definitions = scr_get_flag_type_definitions();
+                    for (var i = 0; i < array_length(definitions); i++)
+                        array_push(types, scr_context_menu_input(definitions[i].label, 1, scr_context_type_action(context_key.flag, definitions[i].key, true)));
+                }
+                else
+                {
+                    scr_select_hitbox_key(timeline, context_track, selected_key);
+                    scr_show_only_text_input_group("hitbox");
+                    var functions = scr_get_hitbox_function_list();
+                    for (var i = 0; i < array_length(functions); i++)
+                        array_push(types, scr_context_menu_input(functions[i], 1, scr_context_type_action(context_key.hitbox, functions[i], false)));
+                }
+                var entry = scr_context_menu_input("Change type >", 1, function() {});
+                entry.children = types;
+                scr_context_menu_set_definition({ key: "key_type", inputs: [entry] });
+                scr_context_menu_open("key_type", id);
+            }
+            else scr_context_menu_open("layer", id);
+        }
+        else scr_context_menu_open("layer", id);
+    }
+    exit;
+}
+if (global.context_active || global.context_click_consumed) exit;
+
 // PHASE KEYBOARD SHORTCUTS
 // N = add new phase after selected phase
 // M = merge selected phase with next phase
@@ -85,14 +142,15 @@ if (global.selected_phase_index >= 0)
 {
     if (keyboard_check_pressed(ord("N")))
     {
-global.selected_phase_index = scr_timeline_add_phase_after(
-    global.timeline,
-    global.selected_phase_index,
-    new_phase_default_duration
-);
-
-scr_sync_json_phase_lasts_from_timeline(global.timeline);
-scr_save_current_attack_json();
+        scr_context_edit(method(id, function()
+        {
+            global.selected_phase_index = scr_timeline_add_phase_after(
+                global.timeline,
+                global.selected_phase_index,
+                new_phase_default_duration
+            );
+            scr_refresh_text_input_group("phase");
+        }));
 
 exit;
     }
@@ -434,7 +492,8 @@ if (mouse_over_timeline && mouse_check_button_pressed(mb_left))
 
             array_push(timeline.tracks, new_track);
 
-            array_push(global.undo_history, {
+            global.redo_history = [];
+        array_push(global.undo_history, {
                 type: "track_added",
                 target: array_length(timeline.tracks) - 1
             });
@@ -607,7 +666,8 @@ if (mouse_check_button_released(mb_left))
 
             if (timing_changed || track_changed)
             {
-                array_push(global.undo_history, {
+                global.redo_history = [];
+        array_push(global.undo_history, {
                     type: "timeline_key_edit",
                     target: timeline_undo_target_key,
                     before: timeline_undo_before_state,

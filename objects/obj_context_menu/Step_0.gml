@@ -1,33 +1,48 @@
-if (variable_global_exists("phase_check_window_open") && global.phase_check_window_open)
+mouse_over_context = false;
+if ((variable_global_exists("phase_check_window_open") && global.phase_check_window_open)
+    || (variable_global_exists("new_attack_window_open") && global.new_attack_window_open))
 {
-    global.context_active = false;
+    scr_context_menu_close();
     exit;
 }
-
-if (variable_global_exists("phase_check_window_open") && global.phase_check_window_open)
+if (!global.context_active) exit;
+// A menu opened by a Mouse event must not select or dismiss on that same click.
+if (variable_global_exists("context_ignore_opening_click") && global.context_ignore_opening_click)
 {
-    global.context_active = false;
+    global.context_ignore_opening_click = false;
+    refresh_layout();
     exit;
 }
-
-var mx = device_mouse_x_to_gui(0)
-var my = device_mouse_y_to_gui(0)
-	
-var full_menu_h =  menu_h * array_length(global.context_items)
-
-mouse_over_context =
-	mx >= global.context_x && 
-	my >= global.context_y && 
-	mx <= global.context_x + menu_w && 
-	my <= global.context_y + full_menu_h;
-		
-if (mouse_check_button_pressed(mb_right)) {
-	global.context_x = mx
-	global.context_y = my
-	global.context_active = true
+if (!instance_exists(global.context_owner) || keyboard_check_pressed(vk_escape))
+{
+    scr_context_menu_close();
+    exit;
 }
-
-if (global.context_active && !mouse_over_context) {
-	if mouse_check_button_pressed(mb_left)
-		global.context_active = false
+refresh_layout();
+var mx = device_mouse_x_to_gui(0);
+var my = device_mouse_y_to_gui(0);
+mouse_over_context = context_contains_mouse();
+for (var i = 0; i < array_length(menu_rows); i++)
+{
+    var row = menu_rows[i];
+    if (!point_in_rectangle(mx, my, row.x, row.y, row.x + menu_w, row.y + menu_h)) continue;
+    if (variable_struct_exists(row.input, "children"))
+    {
+        global.context_submenu = row.index;
+        exit;
+    }
+    if (!row.child && global.context_submenu != -1)
+    {
+        global.context_submenu = -1;
+        refresh_layout();
+    }
+    if (!mouse_check_button_pressed(mb_left) || !scr_context_menu_input_enabled(row.input)) exit;
+    var action = row.input[$ "function"];
+    var owner = global.context_owner;
+    var bound_action = row.input.bound_action;
+    scr_context_menu_close();
+    if (bound_action) action();
+    else method(owner, action)();
+    exit;
 }
+if (mouse_check_button_pressed(mb_left)) scr_context_menu_close();

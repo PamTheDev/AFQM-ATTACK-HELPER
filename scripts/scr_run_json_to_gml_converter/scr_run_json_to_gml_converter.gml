@@ -1,5 +1,6 @@
-function scr_run_json_to_gml_converter(_json_path, _gml_path)
+function scr_run_json_to_gml_converter(_json_path, _gml_path, _export_format = "Workshop")
 {
+    if (_export_format != "UMT" && _export_format != "Workshop") return false;
     var converter_path = working_directory + "tools/JsonToGmlConverter.exe";
 
     converter_path = string_replace_all(converter_path, "\\", "/");
@@ -24,7 +25,7 @@ function scr_run_json_to_gml_converter(_json_path, _gml_path)
         "cmd.exe /C \"\"" +
         converter_path + "\" \"" +
         _json_path + "\" \"" +
-        _gml_path + "\"\"";
+        _gml_path + "\" " + _export_format + "\"";
 
     show_debug_message("Running JSON to GML converter:");
     show_debug_message(command);
