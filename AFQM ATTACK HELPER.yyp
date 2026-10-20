@@ -478,6 +478,7 @@
     {"id":{"name":"timeline_flag_tools","path":"scripts/timeline_flag_tools/timeline_flag_tools.yy",},},
     {"id":{"name":"undo_property","path":"scripts/undo_property/undo_property.yy",},},
     {"id":{"name":"spr_attack_editor","path":"sprites/spr_attack_editor/spr_attack_editor.yy",},},
+    {"id":{"name":"spr_back_button","path":"sprites/spr_back_button/spr_back_button.yy",},},
     {"id":{"name":"spr_context_menu","path":"sprites/spr_context_menu/spr_context_menu.yy",},},
     {"id":{"name":"spr_edit_button","path":"sprites/spr_edit_button/spr_edit_button.yy",},},
     {"id":{"name":"spr_hitbox_buttons","path":"sprites/spr_hitbox_buttons/spr_hitbox_buttons.yy",},},

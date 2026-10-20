@@ -30,8 +30,8 @@
   "resourceVersion":"2.0",
   "solid":false,
   "spriteId":{
-    "name":"spr_hitbox_buttons",
-    "path":"sprites/spr_hitbox_buttons/spr_hitbox_buttons.yy",
+    "name":"spr_back_button",
+    "path":"sprites/spr_back_button/spr_back_button.yy",
   },
   "spriteMaskId":null,
   "visible":true,
