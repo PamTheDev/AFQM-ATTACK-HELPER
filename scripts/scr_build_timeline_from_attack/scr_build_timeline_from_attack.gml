@@ -3,11 +3,13 @@ function scr_build_timeline_from_attack(_attack)
     if (variable_struct_exists(_attack, "editorTimeline"))
     {
         var saved = variable_clone(_attack.editorTimeline);
+        if (!variable_struct_exists(saved, "aerial")) saved.aerial = variable_struct_exists(_attack, "aerial") && _attack.aerial;
         scr_sort_all_timeline_tracks(saved);
         scr_recalculate_timeline_total_frames(saved);
         return saved;
     }
     var timeline = {
+        aerial: variable_struct_exists(_attack, "aerial") && _attack.aerial,
         total_frames: 0,
         phases: [],
         tracks: []

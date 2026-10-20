@@ -1,3 +1,123 @@
+function scr_phase_is_smash(_phase)
+{
+    if (is_undefined(_phase)) return false;
+    if (variable_struct_exists(_phase, "smash")) return _phase.smash;
+    var condition = "if ((!input_held(UnknownEnum.Value_5) && !input_held(UnknownEnum.Value_0) && !input_held(UnknownEnum.Value_1)) || charge >= 90)";
+    return string_pos(scr_phase_compact_code_line(condition), scr_phase_compact_code_line(scr_get_phase_flags_code(_phase))) > 0;
+}
+
+function scr_phase_toggle_smash(_phase)
+{
+    var enabled = !scr_phase_is_smash(_phase);
+    // Imported smash phases carry executable charge code. Remove the recognized
+    // block when disabling so the toggle changes their runtime behavior too.
+    if (!enabled)
+    {
+        var lines = string_split(string_replace_all(scr_get_phase_flags_code(_phase), "\r", ""), "\n");
+        for (var i = 0; i < array_length(lines); i++)
+        {
+            if (scr_phase_compact_code_line(lines[i]) != "charge++;") continue;
+            var condition = i + 1;
+            while (condition < array_length(lines) && scr_phase_line_is_blank(lines[condition])) condition++;
+            if (condition >= array_length(lines)) continue;
+            if (string_pos("if((!input_held(UnknownEnum.Value_5)", scr_phase_compact_code_line(lines[condition])) != 1) continue;
+            var opening = condition + 1;
+            while (opening < array_length(lines) && scr_phase_line_is_blank(lines[opening])) opening++;
+            if (opening >= array_length(lines) || scr_phase_compact_code_line(lines[opening]) != "{") continue;
+            var ending = scr_phase_find_matching_brace(lines, opening);
+            if (ending < 0) continue;
+            var otherwise = ending + 1;
+            while (otherwise < array_length(lines) && scr_phase_line_is_blank(lines[otherwise])) otherwise++;
+            if (otherwise < array_length(lines) && scr_phase_compact_code_line(lines[otherwise]) == "elseif((charge%10)==0)")
+            {
+                var effect_open = otherwise + 1;
+                while (effect_open < array_length(lines) && scr_phase_line_is_blank(lines[effect_open])) effect_open++;
+                if (effect_open < array_length(lines) && scr_phase_compact_code_line(lines[effect_open]) == "{")
+                {
+                    var effect_end = scr_phase_find_matching_brace(lines, effect_open);
+                    if (effect_end >= 0) ending = effect_end;
+                }
+            }
+            array_delete(lines, i, ending - i + 1);
+            scr_set_phase_flags_code(_phase, scr_phase_join_trimmed_code_lines(lines));
+            break;
+        }
+    }
+    _phase.smash = enabled;
+    if (enabled) _phase.extend = false;
+}
+
+// Collapsing changes only the mapping from attack frames to timeline columns.
+function scr_phase_is_collapsed(_phase)
+{
+    return variable_struct_exists(_phase, "collapsed") && _phase.collapsed;
+}
+
+function scr_timeline_collapse_phase(_timeline, _index)
+{
+    if (_index < 0 || _index >= array_length(_timeline.phases)) return;
+    var phase = _timeline.phases[_index];
+    phase.collapsed = !scr_phase_is_collapsed(phase);
+}
+
+function scr_timeline_frame_to_view(_timeline, _frame)
+{
+    var removed = 0;
+    for (var p = 0; p < array_length(_timeline.phases); p++)
+    {
+        var phase = _timeline.phases[p];
+        if (!scr_phase_is_collapsed(phase)) continue;
+        if (_frame < phase.start) break;
+        if (_frame < phase.start + phase.duration)
+            return phase.start - removed + min(1, _frame - phase.start);
+        removed += phase.duration - 1;
+    }
+    return _frame - removed;
+}
+
+function scr_timeline_view_to_frame(_timeline, _column)
+{
+    var removed = 0;
+    for (var p = 0; p < array_length(_timeline.phases); p++)
+    {
+        var phase = _timeline.phases[p];
+        if (!scr_phase_is_collapsed(phase)) continue;
+        var view_start = phase.start - removed;
+        if (_column < view_start + 1) return _column + removed;
+        removed += phase.duration - 1;
+    }
+    return _column + removed;
+}
+
+function scr_timeline_frame_is_hidden(_timeline, _frame)
+{
+    for (var p = 0; p < array_length(_timeline.phases); p++)
+    {
+        var phase = _timeline.phases[p];
+        if (scr_phase_is_collapsed(phase) && _frame >= phase.start + 1 && _frame < phase.start + phase.duration) return true;
+    }
+    return false;
+}
+
+// Drawing and picking share the same clipped geometry; source keys are untouched.
+function scr_timeline_key_view(_timeline, _key, _type)
+{
+    var result = { visible: !scr_timeline_frame_is_hidden(_timeline, _key.start), start: scr_timeline_frame_to_view(_timeline, _key.start), width: 1, clipped: false };
+    var key_end = _key.start + (_type == "animation" ? 1 : _key.duration);
+    for (var p = 0; p < array_length(_timeline.phases); p++)
+    {
+        var phase = _timeline.phases[p];
+        if (scr_phase_is_collapsed(phase) && _key.start < phase.start + phase.duration && key_end > phase.start)
+        {
+            key_end = min(key_end, phase.start + 1);
+            result.clipped = true;
+            break;
+        }
+    }
+    result.width = max(0, scr_timeline_frame_to_view(_timeline, key_end) - result.start);
+    return result;
+}
+
 function scr_timeline_ensure_phases(_timeline)
 {
     if (is_undefined(_timeline)) return;
@@ -128,6 +248,8 @@ function scr_timeline_resize_phase_right(_timeline, _phase_index, _new_duration)
     if (_phase_index < 0) return false;
     if (_phase_index >= array_length(_timeline.phases)) return false;
 
+    if (scr_phase_is_collapsed(_timeline.phases[_phase_index])) return false;
+
     _new_duration = max(1, round(_new_duration));
 
     var phase = _timeline.phases[_phase_index];
@@ -169,6 +291,8 @@ function scr_timeline_resize_phase_left(_timeline, _phase_index, _new_left_frame
 
     if (_phase_index <= 0) return false;
     if (_phase_index >= array_length(_timeline.phases)) return false;
+
+    if (scr_phase_is_collapsed(_timeline.phases[_phase_index]) || scr_phase_is_collapsed(_timeline.phases[_phase_index - 1])) return false;
 
     var prev_phase = _timeline.phases[_phase_index - 1];
 
@@ -245,6 +369,7 @@ function scr_timeline_merge_phase_with_next(_timeline, _phase_index)
 
     var phase = _timeline.phases[_phase_index];
     var next_phase = _timeline.phases[_phase_index + 1];
+    if (scr_phase_is_collapsed(phase) || scr_phase_is_collapsed(next_phase)) return false;
 
     if (!variable_struct_exists(phase, "flags")) phase.flags = [];
 
@@ -284,8 +409,8 @@ function scr_draw_timeline_phase_tags(_timeline, _scroll_x, _frame_w, _content_w
     {
         var phase = _timeline.phases[i];
 
-        var px = phase.start * _frame_w - _scroll_x;
-        var pw = phase.duration * _frame_w;
+        var px = scr_timeline_frame_to_view(_timeline, phase.start) * _frame_w - _scroll_x;
+        var pw = (scr_phase_is_collapsed(phase) ? 1 : phase.duration) * _frame_w;
 
         if (px + pw < 0)
         {
@@ -320,13 +445,17 @@ function scr_draw_timeline_phase_tags(_timeline, _scroll_x, _frame_w, _content_w
         draw_line(px + pw, bracket_y, px + pw, bracket_bottom);
 
         // Resize handles
-        draw_rectangle(px - 2, bracket_y+5, px + 2, bracket_bottom, false);
-        draw_rectangle(px + pw - 2, bracket_y, px + pw + 2, bracket_bottom, false);
+        if (!scr_phase_is_collapsed(phase))
+        {
+            if (i == 0 || !scr_phase_is_collapsed(_timeline.phases[i - 1]))
+                draw_rectangle(px - 2, bracket_y+5, px + 2, bracket_bottom, false);
+            draw_rectangle(px + pw - 2, bracket_y, px + pw + 2, bracket_bottom, false);
+        }
 
         // Name above bracket
 		if ( !(variable_struct_exists(phase, "extend")) or !phase.extend) {
 			draw_set_color(c_white);
-			draw_text(px + 4, 0, (variable_struct_exists(phase, "extend") && phase.extend ? "Extend: " : "") + phase.name);
+			draw_text(px + 4, 0, (scr_phase_is_collapsed(phase) ? "+" : (variable_struct_exists(phase, "extend") && phase.extend ? "Extend: " : "") + phase.name));
 		}
     }
 

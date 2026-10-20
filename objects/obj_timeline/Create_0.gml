@@ -104,7 +104,16 @@ scr_context_menu_set_definition({ key: "phase", inputs: [
             var phase = timeline.phases[global.selected_phase_index];
             phase.extend = !(variable_struct_exists(phase, "extend") && phase.extend);
         }));
-    }, function() { return global.selected_phase_index > 0 && global.selected_phase_index < array_length(timeline.phases) - 1; }),
+    }, function() { return global.selected_phase_index > 0 && global.selected_phase_index < array_length(timeline.phases) - 1 && !scr_phase_is_smash(timeline.phases[global.selected_phase_index]) && !scr_phase_is_collapsed(timeline.phases[global.selected_phase_index]); }),
+    scr_context_menu_input("Collapse Phase", 1, function()
+    {
+        scr_context_edit(method(id, function()
+        {
+            scr_timeline_collapse_phase(timeline, global.selected_phase_index);
+            scroll_x = min(scroll_x, max(0, scr_timeline_frame_to_view(timeline, timeline.total_frames) * frame_w - (timeline_w - header_w)));
+            scr_refresh_text_input_group("phase");
+        }));
+    }, function() { return global.selected_phase_index >= 0 && (scr_phase_is_collapsed(timeline.phases[global.selected_phase_index]) || timeline.phases[global.selected_phase_index].duration > 1); }),
     scr_context_menu_input("Insert Phase", 1, function()
     {
         scr_context_edit(method(id, function()

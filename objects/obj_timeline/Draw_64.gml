@@ -167,9 +167,11 @@ for (var t = 0; t < array_length(timeline.tracks); t++)
 // Frame ruler and vertical frame lines
 
 
-for (var f = 0; f <= timeline.total_frames; f++)
+var view_total = scr_timeline_frame_to_view(timeline, timeline.total_frames);
+for (var column = max(0, floor(scroll_x / frame_w)); column <= min(view_total, ceil((scroll_x + content_w) / frame_w)); column++)
 {
-    var fx = f * frame_w - scroll_x;
+    var f = round(scr_timeline_view_to_frame(timeline, column));
+    var fx = column * frame_w - scroll_x;
 
     if (fx < 0 || fx > content_w)
     {
@@ -209,13 +211,10 @@ for (var t = 0; t < array_length(timeline.tracks); t++)
 
         var key = track.keys[k];
 
-        var key_x = key.start * frame_w - scroll_x;
-        var key_w = max(4, key.duration * frame_w);
-
-        if (track.type == "animation")
-        {
-            key_w = max(4, frame_w);
-        }
+        var key_view = scr_timeline_key_view(timeline, key, track.type);
+        if (!key_view.visible) continue;
+        var key_x = key_view.start * frame_w - scroll_x;
+        var key_w = max(1, key_view.width * frame_w);
 
         if (key_x + key_w < 0 || key_x > content_w)
         {
@@ -309,7 +308,7 @@ else
 			);
 		}
 
-        if (track.type == "animation")
+        if (track.type == "animation" && !key_view.clipped)
         {
             draw_triangle(
                 key_x + key_w,
@@ -350,10 +349,15 @@ else
             key_text = "er";
         }
 
+        if (key_view.clipped)
+        {
+            while (string_length(key_text) > 0 && string_width(key_text) > key_w - 8)
+                key_text = string_delete(key_text, string_length(key_text), 1);
+        }
         draw_text(key_x + 4, local_row_y + 7, key_text);
 
         // Resize handle
-        if (track.type != "animation" && track.type != "flag" )
+        if (track.type != "animation" && track.type != "flag" && !key_view.clipped)
         {
             draw_set_color(c_white);
             draw_rectangle(
@@ -374,7 +378,9 @@ else
 
 if (variable_global_exists("current_timeline_frame"))
 {
-    var playhead_x = global.current_timeline_frame * frame_w - scroll_x;
+    var playhead_column = scr_timeline_frame_to_view(timeline, global.current_timeline_frame);
+    if (scr_timeline_frame_is_hidden(timeline, global.current_timeline_frame)) playhead_column -= 1;
+    var playhead_x = playhead_column * frame_w - scroll_x;
 
     if (playhead_x >= 0 && playhead_x <= content_w)
     {

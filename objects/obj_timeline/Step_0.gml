@@ -82,12 +82,13 @@ if (mouse_over_timeline && mouse_check_button_pressed(mb_right))
     scr_clear_text_input_focus();
     if (mouse_in_phase_area)
     {
-        var frame = floor((mx - content_x + scroll_x) / frame_w);
+        var frame = floor(scr_timeline_view_to_frame(timeline, (mx - content_x + scroll_x) / frame_w));
         global.selected_phase_index = scr_timeline_get_phase_index_at_frame(timeline, frame);
         scr_show_only_text_input_group("phase");
         scr_context_menu_open("phase", id);
         var phase = timeline.phases[global.selected_phase_index];
         global.context_items[1].label = (variable_struct_exists(phase, "extend") && phase.extend ? "[x] " : "[ ] ") + "Extend phase";
+        global.context_items[2].label = scr_phase_is_collapsed(phase) ? "Expand Phase" : "Collapse Phase";
     }
     else
     {
@@ -99,8 +100,11 @@ if (mouse_over_timeline && mouse_check_button_pressed(mb_right))
             var frame = (mx - content_x + scroll_x) / frame_w;
             if (mx >= content_x)
                 for (var k = 0; k < array_length(track.keys); k++)
-                    if (frame >= track.keys[k].start && frame < track.keys[k].start + track.keys[k].duration)
+                {
+                    var key_view = scr_timeline_key_view(timeline, track.keys[k], track.type);
+                    if (key_view.visible && frame >= key_view.start && frame < key_view.start + key_view.width)
                     { context_key = track.keys[k]; selected_track = context_track; selected_key = k; break; }
+                }
             if (!is_undefined(context_key) && (track.type == "flag" || track.type == "hitbox"))
             {
                 var types = [];
@@ -181,7 +185,7 @@ if (phase_drag_mode != "none")
 {
     if (mouse_check_button(mb_left))
     {
-        var mouse_frame = round((mx - content_x + scroll_x) / frame_w);
+        var mouse_frame = round(scr_timeline_view_to_frame(timeline, (mx - content_x + scroll_x) / frame_w));
         mouse_frame = max(0, mouse_frame);
 
         if (phase_drag_mode == "right")
@@ -241,14 +245,15 @@ if (mouse_in_phase_area && mouse_check_button_pressed(mb_left))
     {
         var phase = timeline.phases[p];
 
-        var px1 = content_x + phase.start * frame_w - scroll_x;
-        var px2 = content_x + (phase.start + phase.duration) * frame_w - scroll_x;
+        var px1 = content_x + scr_timeline_frame_to_view(timeline, phase.start) * frame_w - scroll_x;
+        var px2 = content_x + scr_timeline_frame_to_view(timeline, phase.start + phase.duration) * frame_w - scroll_x;
 
-        var over_left = abs(mx - px1) <= phase_resize_handle_w;
-        var over_right = abs(mx - px2) <= phase_resize_handle_w;
-        var inside_phase = mx >= px1 && mx <= px2;
+        var handle_w = min(phase_resize_handle_w, (px2 - px1) / 3);
+        var over_left = mx >= px1 && mx < px1 + handle_w;
+        var over_right = mx >= px2 - handle_w && mx < px2;
+        var inside_phase = mx >= px1 && mx < px2;
 
-        if (over_left && p > 0)
+        if (over_left && p > 0 && !scr_phase_is_collapsed(phase) && !scr_phase_is_collapsed(timeline.phases[p - 1]))
         {
             global.selected_phase_index = p;
             phase_drag_index = p;
@@ -257,7 +262,7 @@ if (mouse_in_phase_area && mouse_check_button_pressed(mb_left))
             show_debug_message("Phase left resize started.");
             break;
         }
-        else if (over_right)
+        else if (over_right && !scr_phase_is_collapsed(phase))
         {
             global.selected_phase_index = p;
             phase_drag_index = p;
@@ -354,13 +359,10 @@ if (mouse_over_timeline && mouse_check_button_pressed(mb_left))
         {
             var key = track.keys[k];
 
-            var key_x = content_x + key.start * frame_w - scroll_x;
-            var key_w = max(6, key.duration * frame_w);
-
-            if (track.type == "animation")
-            {
-                key_w = max(6, frame_w);
-            }
+            var key_view = scr_timeline_key_view(timeline, key, track.type);
+            if (!key_view.visible) continue;
+            var key_x = content_x + key_view.start * frame_w - scroll_x;
+            var key_w = max(1, key_view.width * frame_w);
 
             var key_y1 = row_y + 4;
             var key_y2 = row_y + track_h - 4;
@@ -446,7 +448,7 @@ if (mouse_over_timeline && mouse_check_button_pressed(mb_left))
 
                 var inside_resize_handle = mx >= key_x + key_w - resize_handle_w;
 
-                if (inside_resize_handle && track.type != "animation" && track.type != "flag")
+                if (inside_resize_handle && !key_view.clipped && track.type != "animation" && track.type != "flag")
                 {
                     drag_mode = "resize";
                     show_debug_message("Timeline key resize started.");
@@ -504,7 +506,7 @@ if (mouse_over_timeline && mouse_check_button_pressed(mb_left))
         }
         else if (mx >= content_x && my >= phase_area_y2)
         {
-            var clicked_frame = floor((mx - content_x + scroll_x) / frame_w);
+            var clicked_frame = floor(scr_timeline_view_to_frame(timeline, (mx - content_x + scroll_x) / frame_w));
 
             clicked_frame = clamp(
                 clicked_frame,
@@ -529,7 +531,7 @@ if (mouse_check_button(mb_left))
 {
 	if (mouse_over_timeline_header && drag_mode = "")
 	{
-            var clicked_frame = floor((mx - content_x + scroll_x) / frame_w);
+            var clicked_frame = floor(scr_timeline_view_to_frame(timeline, (mx - content_x + scroll_x) / frame_w));
 
             clicked_frame = clamp(
                 clicked_frame,
@@ -550,7 +552,7 @@ if (mouse_check_button(mb_left))
 
         if (drag_mode == "move")
         {
-            var new_start = drag_start_key_start + frame_delta;
+            var new_start = round(scr_timeline_view_to_frame(timeline, scr_timeline_frame_to_view(timeline, drag_start_key_start) + frame_delta));
             new_start = max(0, new_start);
 
             active_key.start = new_start;
@@ -585,7 +587,7 @@ if (mouse_check_button(mb_left))
 
         if (drag_mode == "resize")
         {
-            var new_duration = drag_start_key_duration + frame_delta;
+            var new_duration = round(scr_timeline_view_to_frame(timeline, scr_timeline_frame_to_view(timeline, drag_start_key_start + drag_start_key_duration) + frame_delta)) - drag_start_key_start;
             new_duration = max(1, new_duration);
 
             active_key.duration = new_duration;

@@ -1,5 +1,21 @@
 timeline = global.timeline;
 
+var focus = variable_global_exists("menu_focus") ? global.menu_focus : "default";
+var default_menu = focus != "hitbox" && focus != "frame" && focus != "flag" && focus != "phase";
+if (default_menu && !is_undefined(timeline) && !instance_exists(obj_window)
+    && !(variable_global_exists("context_active") && global.context_active)
+    && mouse_check_button_pressed(mb_left)
+    && point_in_rectangle(device_mouse_x_to_gui(0), device_mouse_y_to_gui(0), panel_x + 20, panel_y + 95, panel_x + 340, panel_y + 137))
+{
+    scr_clear_text_input_focus();
+    scr_context_edit(function()
+    {
+        var attack = global.timeline;
+        attack.aerial = !(variable_struct_exists(attack, "aerial") && attack.aerial);
+    });
+}
+
+
 if (!variable_global_exists("phase_check_window_reopen_block"))
 {
     global.phase_check_window_reopen_block = 0;
@@ -44,6 +60,17 @@ if (
         else if (point_in_rectangle(mx, my, button_x1, end_state_y1, button_x2, end_state_y2))
         {
             requested_window_mode = "attack_stop";
+        }
+
+        if (point_in_rectangle(mx, my, button_x1, panel_y + 205, button_x1 + 320, panel_y + 247))
+        {
+            scr_clear_text_input_focus();
+            scr_context_edit(function()
+            {
+                var phase = scr_get_selected_phase();
+                scr_phase_toggle_smash(phase);
+            });
+            scr_refresh_text_input_group("phase");
         }
 
         if (requested_window_mode != "")

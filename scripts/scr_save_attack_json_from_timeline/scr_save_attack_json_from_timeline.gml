@@ -33,6 +33,7 @@ function scr_save_attack_json_from_timeline(_timeline, _json_path)
 
     var output = {
         version: 1,
+        aerial: variable_struct_exists(_timeline, "aerial") && _timeline.aerial,
         sprite: sprite_name,
         name: attack_name,
         phases: []
@@ -57,6 +58,7 @@ function scr_save_attack_json_from_timeline(_timeline, _json_path)
         var phase_lasts = max(0, phase_duration - 1);
 
         var json_phase = {
+            smash: scr_phase_is_smash(timeline_phase),
             lasts: string(phase_lasts),
             frames: []
         };
